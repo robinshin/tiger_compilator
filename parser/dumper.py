@@ -1,6 +1,7 @@
 from ast.nodes import *
 from utils.visitor import *
 
+
 class Dumper(Visitor):
 
     def __init__(self, semantics):
@@ -19,10 +20,16 @@ class Dumper(Visitor):
 
     @visitor(BinaryOperator)
     def visit(self, binop):
-        # Always use parentheses to reflect grouping and associativity, even if they may
-        # be superfluous.
-        return "(%s %s %s)" % (binop.left.accept(self), binop.op, binop.right.accept(self))
+        # Always use parentheses to reflect grouping and associativity,
+        # even if they may be superfluous.
+        return "(%s %s %s)" % \
+               (binop.left.accept(self), binop.op, binop.right.accept(self))
 
     @visitor(Identifier)
     def visit(self, id):
-        return id.name
+        if self.semantics:
+            diff = id.depth - id.decl.depth
+            scope_diff = "{%d}" % diff if diff else ''
+        else:
+            scope_diff = ''
+        return '%s%s' % (id.name, scope_diff)
