@@ -23,6 +23,10 @@ parser.add_option("-e", "--eval",
                   help="evaluate input file to output",
                   action="store_true", default=False,
                   dest="eval")
+parser.add_option("-t", "--type",
+                  help="invoke the typer",
+                  action="store_true", default=False,
+                  dest="type")
 parser.usage = """%prog [options] [file]"""
 parser.description = "Compile a Tiger program (or standard input)"
 
@@ -41,9 +45,12 @@ else:
 
 tree = parse(content)
 
-if options.bind:
+if options.bind or options.type:
     from semantics.binder import Binder
     tree.accept(Binder())
+    if options.type:
+        from typer.typer import Typer
+        Typer().run(tree, True)
 
 if options.dump:
     from parser.dumper import Dumper
