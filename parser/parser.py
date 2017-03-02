@@ -6,12 +6,14 @@ tokens = tokenizer.tokens
 
 precedence = (
     ('left', 'PLUS'),
-    ('left', 'TIMES')
+    ('left', 'TIMES'),
+    ('left', 'MINUS')
 )
 
 def p_expression_binop(p):
     '''expression : expression PLUS expression
-                  | expression TIMES expression'''
+                  | expression TIMES expression
+		  | expression MINUS expression'''
     p[0] = BinaryOperator(p[2], p[1], p[3])
 
 def p_expression_parentheses(p):

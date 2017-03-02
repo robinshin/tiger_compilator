@@ -17,6 +17,8 @@ class Evaluator:
             return left + right
         elif op == '*':
             return left * right
+        elif op == '-':
+            return left - right
         else:
             raise SyntaxError("unknown operator %s" % op)
 
