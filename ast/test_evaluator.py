@@ -31,6 +31,12 @@ class TestEvaluator(unittest.TestCase):
         self.parse_check('1 + 2 * 3', 7)
         self.parse_check('2 * 3 + 1', 7)
         self.parse_check('10 - 1 - 2', 7)
+        self.parse_check('1 | 0', 1)
+        self.parse_check('0 & 0', 0)
+        self.parse_check('1 < 4', 1)
+        self.parse_check('3 > 5', 0)
+        self.parse_check('4 = 5', 0)
+        self.parse_check('6 <> 4', 1)
 
 if __name__ == '__main__':
     unittest.main()

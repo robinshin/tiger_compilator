@@ -23,7 +23,8 @@ keywords = {'array': 'ARRAY',
 # List of tokens that can be recognized and are handled by the current
 # grammar rules.
 tokens = ('END', 'IN', 'LET', 'VAR',
-          'PLUS', 'TIMES', 'MINUS',
+          'PLUS', 'TIMES', 'MINUS', 'DIVIDE', 'AND', 'OR',
+	  'SMALLER', 'SMALLEROREQUALS', 'BIGGER', 'BIGGEROREQUALS', 'EQUALS', 'DIFFERENT',
           'COMMA', 'SEMICOLON',
           'LPAREN', 'RPAREN',
           'NUMBER', 'ID',
@@ -32,6 +33,15 @@ tokens = ('END', 'IN', 'LET', 'VAR',
 t_PLUS = r'\+'
 t_TIMES = r'\*'
 t_MINUS = r'\-'
+t_DIVIDE = r'\/'
+t_AND = r'\&'
+t_OR = r'\|'
+t_SMALLER = r'\<'
+t_SMALLEROREQUALS = r'\<='
+t_BIGGER = r'\>'
+t_BIGGEROREQUALS = r'\>='
+t_EQUALS = r'\='
+t_DIFFERENT = r'\<>'
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
 t_COLON = r':'
