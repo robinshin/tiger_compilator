@@ -37,6 +37,7 @@ class TestEvaluator(unittest.TestCase):
         self.parse_check('3 > 5', 0)
         self.parse_check('4 = 5', 0)
         self.parse_check('6 <> 4', 1)
+        self.parse_check('if 1 then 100 else 200 + 300', 100)
 
 if __name__ == '__main__':
     unittest.main()

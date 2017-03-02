@@ -45,6 +45,10 @@ def p_expression_identifier(p):
     'expression : ID'
     p[0] = Identifier(p[1])
 
+def p_expression_ifthenelse(p):
+    'expression : IF expression THEN expression ELSE expression'
+    p[0] = IfThenElse(p[2], p[4], p[6])
+
 def p_error(p):
     import sys
     sys.stderr.write("no way to analyze %s\n" % p)

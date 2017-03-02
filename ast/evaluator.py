@@ -58,6 +58,13 @@ class Evaluator:
         else:
             raise SyntaxError("unknown operator %s" % op)
 
+    @visitor(IfThenElse)
+    def visit(self, ifthenelse):
+        if ifthenelse.condition.accept(self) != 0:
+            return ifthenelse.then_part.accept(self)
+        else:
+            return ifthenelse.else_part.accept(self)
+
     @visitor(None)
     def visit(self, node):
         raise SyntaxError("no evaluation defined for %s" % node)

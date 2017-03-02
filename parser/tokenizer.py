@@ -28,7 +28,8 @@ tokens = ('END', 'IN', 'LET', 'VAR',
           'COMMA', 'SEMICOLON',
           'LPAREN', 'RPAREN',
           'NUMBER', 'ID',
-          'COLON', 'ASSIGN')
+          'COLON', 'ASSIGN',
+	  'IF', 'THEN', 'ELSE')
 
 t_PLUS = r'\+'
 t_TIMES = r'\*'
@@ -48,6 +49,9 @@ t_COLON = r':'
 t_ASSIGN = r':='
 t_COMMA = r','
 t_SEMICOLON = r';'
+t_IF = r'if'
+t_THEN = r'then'
+t_ELSE = r'else'
 
 t_ignore = ' \t'
 
