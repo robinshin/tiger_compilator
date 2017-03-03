@@ -12,6 +12,13 @@ class TestEvaluator(unittest.TestCase):
     def parse_check(self, str, expected):
         self.assertEqual(parse(str).accept(Evaluator()), expected)
 
+    def parse_failure(self, str):
+        try:
+            parse(str)
+        except:
+            return
+        raise NameError('AssertionError')
+
     def test_literal(self):
         self.check(IntegerLiteral(42), 42)
 
@@ -26,6 +33,7 @@ class TestEvaluator(unittest.TestCase):
 
     def test_parse_sequence(self):
         self.parse_check('1+(2+3)+4', 10)
+        self.parse_failure('10 = 10 = 10')
 
     def test_precedence(self):
         self.parse_check('1 + 2 * 3', 7)
