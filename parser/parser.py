@@ -15,15 +15,16 @@ precedence = (
 def p_expression_binop(p):
     '''expression : expression PLUS expression
                   | expression TIMES expression
-		  | expression MINUS expression
-		  | expression AND expression
-		  | expression OR expression
-		  | expression SMALLER expression
-		  | expression SMALLEROREQUALS expression
-		  | expression BIGGER expression
-		  | expression BIGGEROREQUALS expression
-		  | expression EQUALS expression
-		  | expression DIFFERENT expression'''
+                  | expression DIVIDE expression
+                  | expression MINUS expression
+                  | expression AND expression
+                  | expression OR expression
+                  | expression SMALLER expression
+                  | expression SMALLEROREQUALS expression
+                  | expression BIGGER expression
+                  | expression BIGGEROREQUALS expression
+                  | expression EQUALS expression
+                  | expression DIFFERENT expression'''
     p[0] = BinaryOperator(p[2], p[1], p[3])
 
 def p_expression_parentheses(p):

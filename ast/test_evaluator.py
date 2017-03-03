@@ -30,22 +30,17 @@ class TestEvaluator(unittest.TestCase):
     def test_precedence(self):
         self.parse_check('1 + 2 * 3', 7)
         self.parse_check('2 * 3 + 1', 7)
-        self.parse_check('1 < 4', 1)
-        self.parse_check('3 > 5', 0)
-        self.parse_check('4 = 5', 0)
-        self.parse_check('6 <> 4', 1)
-        self.parse_check('if 1 then 100 else 200 + 300', 100)
 
-    def test_basic_operator_minus(self):
+    def test_basic_operator_arith(self):
         self.check(BinaryOperator('-', IntegerLiteral(10), IntegerLiteral(5)), 5)
         self.parse_check('10 - 1 - 2', 7)
+        self.check(BinaryOperator('/', IntegerLiteral(6), IntegerLiteral(2)), 3)
+        self.check(BinaryOperator('*', IntegerLiteral(6), IntegerLiteral(2)), 12)
 
-    def test_basic_operator_or(self):
+    def test_basic_operator_logic(self):
         self.check(BinaryOperator('|', IntegerLiteral(1), IntegerLiteral(0)), 1) 
         self.check(BinaryOperator('|', IntegerLiteral(0), IntegerLiteral(0)), 0)
         self.check(BinaryOperator('|', IntegerLiteral(1), IntegerLiteral(1)), 1)
-
-    def test_basic_operator_and(self):
         self.check(BinaryOperator('&', IntegerLiteral(1), IntegerLiteral(0)), 0) 
         self.check(BinaryOperator('&', IntegerLiteral(0), IntegerLiteral(0)), 0)
         self.check(BinaryOperator('&', IntegerLiteral(1), IntegerLiteral(1)), 1)

@@ -24,17 +24,17 @@ keywords = {'array': 'ARRAY',
 # grammar rules.
 tokens = ('END', 'IN', 'LET', 'VAR',
           'PLUS', 'TIMES', 'MINUS', 'DIVIDE', 'AND', 'OR',
-	  'SMALLER', 'SMALLEROREQUALS', 'BIGGER', 'BIGGEROREQUALS', 'EQUALS', 'DIFFERENT',
+          'SMALLER', 'SMALLEROREQUALS', 'BIGGER', 'BIGGEROREQUALS', 'EQUALS', 'DIFFERENT',
           'COMMA', 'SEMICOLON',
           'LPAREN', 'RPAREN',
           'NUMBER', 'ID',
           'COLON', 'ASSIGN',
-	  'IF', 'THEN', 'ELSE')
+          'IF', 'THEN', 'ELSE')
 
 t_PLUS = r'\+'
 t_TIMES = r'\*'
 t_MINUS = r'\-'
-t_DIVIDE = r'\/'
+t_DIVIDE = r'/'
 t_AND = r'\&'
 t_OR = r'\|'
 t_SMALLER = r'\<'
