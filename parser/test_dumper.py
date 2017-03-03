@@ -19,5 +19,8 @@ class TestDumper(unittest.TestCase):
         self.check("1+2*3", "(1 + (2 * 3))")
         self.check("2*3+1", "((2 * 3) + 1)")
 
+    def test_ifthenelse(self):
+        self.check('if 1 then 2 else 3', 'if 1 then 2 else 3')
+
 if __name__ == '__main__':
     unittest.main()
