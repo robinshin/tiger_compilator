@@ -5,9 +5,10 @@ import ply.yacc as yacc
 tokens = tokenizer.tokens
 
 precedence = (
+    ('nonassoc', 'ELSE'),
+    ('nonassoc', 'SMALLER', 'SMALLEROREQUALS', 'BIGGER', 'BIGGEROREQUALS', 'EQUALS', 'DIFFERENT'),
     ('left', 'OR'),
     ('left', 'AND'),
-    ('nonassoc', 'SMALLER', 'SMALLEROREQUALS', 'BIGGER', 'BIGGEROREQUALS', 'EQUALS', 'DIFFERENT'),
     ('left', 'PLUS', 'MINUS'),
     ('left', 'TIMES', 'DIVIDE')
 )
