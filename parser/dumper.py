@@ -25,7 +25,7 @@ class Dumper(Visitor):
 
     @visitor(IfThenElse)
     def visit(self, ifthenelse):
-        return "('if' %s 'then' %s 'else' %s)" % (ifthenelse.condition.accept(self), ifthenelse.then_part.accept(self), ifthenelse.else_part(self))
+        return "if %s then %s else %s" % (ifthenelse.condition.accept(self), ifthenelse.then_part.accept(self), ifthenelse.else_part.accept(self))
 
     @visitor(Identifier)
     def visit(self, id):

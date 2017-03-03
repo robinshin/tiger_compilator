@@ -24,34 +24,31 @@ keywords = {'array': 'ARRAY',
 # grammar rules.
 tokens = ('END', 'IN', 'LET', 'VAR',
           'PLUS', 'TIMES', 'MINUS', 'DIVIDE', 'AND', 'OR',
-	  'SMALLER', 'SMALLEROREQUALS', 'BIGGER', 'BIGGEROREQUALS', 'EQUALS', 'DIFFERENT',
+          'SMALLER', 'SMALLEROREQUALS', 'BIGGER', 'BIGGEROREQUALS', 'EQUALS', 'DIFFERENT',
           'COMMA', 'SEMICOLON',
           'LPAREN', 'RPAREN',
           'NUMBER', 'ID',
           'COLON', 'ASSIGN',
-	  'IF', 'THEN', 'ELSE')
+          'IF', 'THEN', 'ELSE')
 
 t_PLUS = r'\+'
 t_TIMES = r'\*'
-t_MINUS = r'\-'
-t_DIVIDE = r'\/'
+t_MINUS = r'-'
+t_DIVIDE = r'/'
 t_AND = r'\&'
 t_OR = r'\|'
-t_SMALLER = r'\<'
-t_SMALLEROREQUALS = r'\<='
-t_BIGGER = r'\>'
-t_BIGGEROREQUALS = r'\>='
-t_EQUALS = r'\='
-t_DIFFERENT = r'\<>'
+t_SMALLER = r'<'
+t_SMALLEROREQUALS = r'<='
+t_BIGGER = r'>'
+t_BIGGEROREQUALS = r'>='
+t_EQUALS = r'='
+t_DIFFERENT = r'<>'
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
 t_COLON = r':'
 t_ASSIGN = r':='
 t_COMMA = r','
 t_SEMICOLON = r';'
-t_IF = r'if'
-t_THEN = r'then'
-t_ELSE = r'else'
 
 t_ignore = ' \t'
 
