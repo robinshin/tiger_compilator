@@ -23,6 +23,11 @@ class Dumper(Visitor):
         # be superfluous.
         return "(%s %s %s)" % (binop.left.accept(self), binop.op, binop.right.accept(self))
 
+    @visitor(IfThenElse)
+    def visit(self, ifthenelse):
+        return "('if' %s 'then' %s 'else' %s)" % (ifthenelse.condition.accept(self), ifthenelse.then_part.accept(self), ifthenelse.else_part(self))
+
     @visitor(Identifier)
     def visit(self, id):
         return id.name
+
