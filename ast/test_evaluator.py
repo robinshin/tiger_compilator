@@ -36,6 +36,7 @@ class TestEvaluator(unittest.TestCase):
         self.parse_check('10 - 1 - 2', 7)
         self.check(BinaryOperator('/', IntegerLiteral(6), IntegerLiteral(2)), 3)
         self.check(BinaryOperator('*', IntegerLiteral(6), IntegerLiteral(2)), 12)
+        self.check(BinaryOperator('/', IntegerLiteral(5), IntegerLiteral(2)), 2)
 
     def test_basic_operator_logic(self):
         self.check(BinaryOperator('|', IntegerLiteral(1), IntegerLiteral(0)), 1) 
