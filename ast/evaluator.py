@@ -25,12 +25,18 @@ class Evaluator:
             if not left:
                 return 0
             else:
-                return right
+                if right:
+                    return 1
+                else:
+                    return 0
         elif op == '|':
             if left:
                 return 1
             else:
-                return right
+                if right:
+                    return 1
+                else:
+                    return 0
         elif op == '<':
             return left < right
         elif op == '<=':

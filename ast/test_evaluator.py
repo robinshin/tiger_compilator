@@ -50,9 +50,11 @@ class TestEvaluator(unittest.TestCase):
         self.check(BinaryOperator('|', IntegerLiteral(1), IntegerLiteral(0)), 1) 
         self.check(BinaryOperator('|', IntegerLiteral(0), IntegerLiteral(0)), 0)
         self.check(BinaryOperator('|', IntegerLiteral(1), IntegerLiteral(1)), 1)
+        self.check(BinaryOperator('|', IntegerLiteral(4), IntegerLiteral(2)), 1)
         self.check(BinaryOperator('&', IntegerLiteral(1), IntegerLiteral(0)), 0) 
         self.check(BinaryOperator('&', IntegerLiteral(0), IntegerLiteral(0)), 0)
         self.check(BinaryOperator('&', IntegerLiteral(1), IntegerLiteral(1)), 1)
+        self.check(BinaryOperator('&', IntegerLiteral(4), IntegerLiteral(2)), 1)
 
     def test_basic_comparison(self):
         self.check(BinaryOperator('<', IntegerLiteral(5), IntegerLiteral(3)), 0) 
