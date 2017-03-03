@@ -22,7 +22,7 @@ class Evaluator:
         elif op == '/':
             return int(left / right)
         elif op == '&':
-            if not left:
+            if left==0:
                 return 0
             else:
                 if right:
