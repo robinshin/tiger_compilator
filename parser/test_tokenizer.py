@@ -32,6 +32,12 @@ class TestLexer(unittest.TestCase):
     def test_keyword(self):
         lexer.input("var")
         self.check('VAR', 'var')
+        lexer.input("let")
+        self.check('LET', 'let')
+        lexer.input("IN")
+        self.check('IN','in')
+        lexer.input("END")
+        self.check('END','end')
         self.check_end()
 
     def test_identifier(self):
