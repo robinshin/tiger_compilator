@@ -29,6 +29,20 @@ class Dumper(Visitor):
     def visit(self, ifthenelse):
         return "if %s then %s else %s" % (ifthenelse.condition.accept(self), ifthenelse.then_part.accept(self), ifthenelse.else_part.accept(self))
 
+    @visitor(VarDecl)
+    def visit(self, decl):
+        return "var %s := %s" % (decl.name, decl.exp.accept(self))
+
+    @visitor(Let)
+    def visit(self, let):
+        decls = ''
+        expr = ''
+        for decl in let.decls:
+            decls += decl.accept(self)
+        for exp in let.exps:
+            expr += exp.accept(self)
+        return "let %s in %s end" % (decls, expr)
+
     @visitor(Identifier)
     def visit(self, id):
         if self.semantics:

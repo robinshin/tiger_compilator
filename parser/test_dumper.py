@@ -22,5 +22,8 @@ class TestDumper(unittest.TestCase):
     def test_ifthenelse(self):
         self.check('if 1 then 2 else 3', 'if 1 then 2 else 3')
 
+    def test_letinend(self):
+        self.check('let var a := 2 in a end', 'let var a := 2 in a end')
+
 if __name__ == '__main__':
     unittest.main()
