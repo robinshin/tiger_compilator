@@ -1,14 +1,12 @@
-image: python:3.4
+image: rfc1149/se202
 
-self-tests:
-  stage: test
+cache:
+  key: all
+  paths:
+    - download
+
+test:
   script:
-    - pip install ply
     - python -m unittest
-
-evaluation-tests:
-  stage: test
-  script:
-    - curl -s https://www.rfc1149.net/tmp/evaluation-se202.tar.gz | tar zxf -
-    - pip install ply
+    - (mkdir -p download && cd download && wget -N -q https://www.rfc1149.net/tmp/evaluation-se202.tar.gz) && tar zxf download/evaluation-se202.tar.gz
     - support/run-step
