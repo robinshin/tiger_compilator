@@ -127,7 +127,6 @@ class Typer(Visitor):
         self.visit_all(decl.children)
         self.merge(decl, decl.type)
         self.merge(decl, decl.exp)
-        self.merge(decl.type, decl.exp)
 
     @visitor(FunDecl)
     def visit(self, decl):
