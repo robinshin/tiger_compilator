@@ -36,6 +36,21 @@ class Dumper(Visitor):
         else:
             return "var %s: %s := %s" % (decl.name, decl.type.typename, decl.exp.accept(self))
 
+    @visitor(FunDecl)
+    def visit(self, func):
+        args = ''
+        size = len(func.args)
+        i = 0
+        if size != 0:
+            for arg in func.args:
+                args += ("%s, " % arg if i != size else "%s")
+                i += 1
+
+        if func.type == None:
+            return "function %s(%s) = %s" % (func.name, args, func.exp.accept(self))
+        else:
+            return "function %s(%s): %s = %s" % (func.name, args, func.type.typename, func.exp.accept(self))
+
     @visitor(Let)
     def visit(self, let):
         decls = ''
