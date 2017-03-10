@@ -20,6 +20,7 @@ keywords = {'array': 'ARRAY',
             'var': 'VAR',
             'while': 'WHILE'}
 
+
 # List of tokens that can be recognized and are handled by the current
 # grammar rules.
 tokens = ('END', 'IN', 'LET', 'VAR',

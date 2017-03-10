@@ -67,7 +67,7 @@ class Binder(Visitor):
             raise BindException("name not found: %s" % name)
 
     @visitor(LetInEnd)
-    def visit(self, decl):
+    def visit(self, let):
         for decl in let.decls:
             self.add_binding(decl)
         for expr in let.exprs:
@@ -75,7 +75,7 @@ class Binder(Visitor):
                 self.depth++
                 self.visit(expr)
                 self.depth--
-            if isistance(expr, FuncCall):
+            if isinstance(expr, FunCall):
                 self.lookup(expr.identifier)
             else
                 self.lookup(expr)

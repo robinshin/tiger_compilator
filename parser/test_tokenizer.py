@@ -34,9 +34,9 @@ class TestLexer(unittest.TestCase):
         self.check('VAR', 'var')
         lexer.input("let")
         self.check('LET', 'let')
-        lexer.input("IN")
+        lexer.input("in")
         self.check('IN','in')
-        lexer.input("END")
+        lexer.input("end")
         self.check('END','end')
         self.check_end()
 

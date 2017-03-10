@@ -76,7 +76,7 @@ def p_argssome(p):
 
 def p_expression_letinend(p):
     'expression : LET decls IN expression END'
-    p[0] = Let(p[2], p[4])
+    p[0] = LetInEnd(p[4], p[2])
 
 def p_error(p):
     import sys
