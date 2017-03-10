@@ -24,6 +24,7 @@ class TestDumper(unittest.TestCase):
 
     def test_letinend(self):
         self.check('let var a := 2 in a end', 'let var a := 2 in a end')
+        self.check('let var a: int := 2 in a end', 'let var a: int := 2 in a end')
 
 if __name__ == '__main__':
     unittest.main()

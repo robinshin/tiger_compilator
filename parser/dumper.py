@@ -31,7 +31,10 @@ class Dumper(Visitor):
 
     @visitor(VarDecl)
     def visit(self, decl):
-        return "var %s := %s" % (decl.name, decl.exp.accept(self))
+        if decl.type == None:
+            return "var %s := %s" % (decl.name, decl.exp.accept(self))
+        else:
+            return "var %s: %s := %s" % (decl.name, decl.type.typename, decl.exp.accept(self))
 
     @visitor(Let)
     def visit(self, let):

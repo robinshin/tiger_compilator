@@ -57,7 +57,7 @@ def p_decl(p):
 def p_var_decl(p):
     '''var_decl : VAR ID ASSIGN expression
                 | VAR ID COLON INT ASSIGN expression'''
-    p[0] = VarDecl(p[2], None, p[4]) if (len(p) == 5) else VarDecl(p[2], Type(p[4]), p[5])
+    p[0] = VarDecl(p[2], None, p[4]) if (len(p) == 5) else VarDecl(p[2], Type(p[4]), p[6])
 
 def p_fun_decl(p):
     '''fun_decl : FUNCTION ID LPAREN args RPAREN EQUAL expression

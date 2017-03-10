@@ -18,7 +18,8 @@ keywords = {'array': 'ARRAY',
             'to': 'TO',
             'type': 'TYPE',
             'var': 'VAR',
-            'while': 'WHILE'}
+            'while': 'WHILE',
+            'int': 'INT'}
 
 
 # List of tokens that can be recognized and are handled by the current
