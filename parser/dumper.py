@@ -55,11 +55,12 @@ class Dumper(Visitor):
     def visit(self, let):
         decls = ''
         expr = ''
+        size = len(let.decls)
         for decl in let.decls:
-            decls += decl.accept(self)
+            decls += decl.accept(self) + ('\n' if size != 1 else '')
         for exp in let.exps:
             expr += exp.accept(self)
-        return "let %s in %s end" % (decls, expr)
+        return "let %s in %s end" % (decls, expr) if size == 1 else "let\n%sin\n%s\nend" %(decls, expr)
 
     @visitor(Identifier)
     def visit(self, id):

@@ -28,6 +28,8 @@ class TestDumper(unittest.TestCase):
         self.check('let function f(): int = 1 + 2 in 1 end', 'let function f(): int = (1 + 2) in 1 end')
         self.check('let function f(a: int) = 1 in 1 end', 'let function f(a: int) = 1 in 1 end')
         self.check('let function f(a: int, b: int, c: int) = 2 in 2 end', 'let function f(a: int, b: int, c: int) = 2 in 2 end')
+        self.check('let function f(a: int) = 1 var a := 2 in a end', 'let function f(a: int) = 1 var a := 2 in a end')
+        self.check('let\nfunction f(a: int) = 1\nvar a := 2\nin\na\nend', 'let\nfunction f(a: int) = 1\nvar a := 2\nin\na\nend')
 
 if __name__ == '__main__':
     unittest.main()
