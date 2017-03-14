@@ -66,13 +66,23 @@ def p_fun_decl(p):
 
 def p_args(p):
     '''args :
-            | argssome'''
+            | argssome
+            | argssome_fun_decl'''
     p[0] = p[1] if len(p) == 2 else []
 
 def p_argssome(p):
     '''argssome : expression
                 | argssome COMMA expression'''
     p[0] = [p[1]] if len(p) == 2 else p[1] + [p[3]]
+
+def p_argssome_fun_decl(p):
+    '''argssome_fun_decl : argdecl
+                         | argssome_fun_decl COMMA argdecl'''
+    p[0] = [p[1]] if len(p) == 2 else p[1] + [p[3]]
+
+def p_argdecl(p):
+    '''argdecl : ID COLON INT'''
+    p[0] = VarDecl(p[1], Type(p[3]), None)
 
 def p_expression_let(p):
     'expression : LET decls IN expression END'

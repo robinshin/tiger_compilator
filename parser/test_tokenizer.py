@@ -38,6 +38,10 @@ class TestLexer(unittest.TestCase):
         self.check('IN','in')
         lexer.input("end")
         self.check('END','end')
+        lexer.input("int")
+        self.check('INT', 'int')
+        lexer.input("function")
+        self.check('FUNCTION', 'function')
         self.check_end()
 
     def test_identifier(self):

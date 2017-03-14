@@ -40,10 +40,10 @@ class Dumper(Visitor):
     def visit(self, func):
         args = ''
         size = len(func.args)
-        i = 0
+        i = 1
         if size != 0:
             for arg in func.args:
-                args += ("%s, " % arg if i != size else "%s")
+                args += ("%s: %s, " % (arg.name, arg.type.typename) if i != size else "%s: %s" % (arg.name, arg.type.typename))
                 i += 1
 
         if func.type == None:
