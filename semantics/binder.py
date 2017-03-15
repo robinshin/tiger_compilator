@@ -69,7 +69,10 @@ class Binder(Visitor):
     @visitor(Let)
     def visit(self, let):
         for decl in let.decls:
-            self.add_binding(decl)
+            if isinstance(decl, ):
+                self.depth += 1
+                self.add_binding(decl, VarDecl)
+                self.depth -=1
         for expr in let.exps:
             if isinstance(expr, Let):
                 self.depth += 1
