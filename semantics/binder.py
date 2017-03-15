@@ -72,9 +72,9 @@ class Binder(Visitor):
             self.add_binding(decl)
         for expr in let.exps:
             if isinstance(expr, let):
-                self.depth = self.depth + 1
+                self.depth += 1
                 self.visit(expr)
-                self.depth = self.depth - 1
+                self.depth -= 1
             if isinstance(expr, FunCall):
                 self.lookup(expr.identifier)
             else:
