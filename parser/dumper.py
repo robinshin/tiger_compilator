@@ -43,7 +43,7 @@ class Dumper(Visitor):
         i = 1
         if size != 0:
             for arg in func.args:
-                args += ("%s: %s, " % (arg.name, arg.type.typename) if i != size else "%s: %s" % (arg.name, arg.type.typename))
+                args += "%s: %s" % (arg.name, arg.type.typename) + (", " if i != size else "")
                 i += 1
 
         if func.type == None:
@@ -70,3 +70,14 @@ class Dumper(Visitor):
         else:
             scope_diff = ''
         return '%s%s' % (id.name, scope_diff)
+
+    @visitor(FunCall)
+    def visit(self, func):
+        params = ''
+        size = len(func.params)
+        i = 1
+        if size != 0:
+            for param in func.params:
+                params += param.accept(self) + (", " if i != size else "")
+                i = i + 1
+        return "%s(%s)" % (func.identifier.name, params)
