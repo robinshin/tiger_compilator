@@ -67,7 +67,7 @@ class Binder(Visitor):
             raise BindException("name not found: %s" % name)
 
     @visitor(VarDecl)
-    def visit(self, vardecl)
+    def visit(self, vardecl):
         self.add_binding(vardecl)
         if isinstance(vardecl.exp, Identifier):
             if vardecl.exp.name == vardecl.name:
