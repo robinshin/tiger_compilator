@@ -66,6 +66,15 @@ class Binder(Visitor):
         else:
             raise BindException("name not found: %s" % name)
 
+    @visitor(VarDecl)
+    def visit(self, vardecl)
+        self.add_binding(vardecl)
+        if isinstance(vardecl.exp, Identifier):
+            if vardecl.exp.name == vardecl.name:
+                raise BindException("Can't declare a variable as itself")
+        if vardecl.exp is not None:
+            vardecl.exp.accept(self)
+
     @visitor(Let)
     def visit(self, let):
         for decl in let.decls:
