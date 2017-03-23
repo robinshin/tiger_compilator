@@ -68,17 +68,14 @@ class Binder(Visitor):
 
     @visitor(VarDecl)
     def visit(self, vardecl):
-        self.add_binding(vardecl)
-        if isinstance(vardecl.exp, Identifier):
-            if vardecl.exp.name == vardecl.name:
-                raise BindException("Can't declare a variable as itself")
-        if vardecl.exp is not None:
+        if vardecl.exp != None:
             vardecl.exp.accept(self)
+        self.add_binding(vardecl)
 
     @visitor(Let)
     def visit(self, let):
         for decl in let.decls:
-                self.add_binding(decl, VarDecl)
+                self.add_binding(decl)
         for expr in let.exps:
             if isinstance(expr, Let):
                 self.depth += 1
