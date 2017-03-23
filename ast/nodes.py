@@ -12,6 +12,7 @@ class Node:
 
     def __init__(self):
         self.children = []
+        self.type = None
 
     def accept(self, visitor):
         return visitor.visit(self)
@@ -44,8 +45,8 @@ class Let(Node):
         super().__init__()
         assert isinstance(decls, list), "declarations must be put in a list"
         for decl in decls:
-            assert isinstance(decl, Node), \
-                    "declarations must be Node instances"
+            assert isinstance(decl, Decl), \
+                    "declarations must be VarDecl or FunDecl instances"
         assert isinstance(exps, list), "expressions must be put in a list"
         for exp in exps:
             assert isinstance(exp, Node), "expressions must be Node instances"
@@ -61,6 +62,7 @@ class Identifier(Node):
         assert isinstance(name, str), "name must be a string"
         self.name = name
         self.decl = None
+        self.depth = None
 
 
 class IfThenElse(Node):
@@ -74,3 +76,70 @@ class IfThenElse(Node):
         self.then_part = then_part
         self.else_part = else_part
         self.children = [condition, then_part, else_part]
+
+
+class Type(Node):
+
+    def __init__(self, typename):
+        super().__init__()
+        assert isinstance(typename, str), "type name must be a string"
+        self.typename = typename
+
+
+class Decl(Node):
+    """Abstract type regrouping various entity declarations"""
+
+    def __init__(self):
+        super().__init__()
+        self.escapes = False
+        self.depth = None
+
+
+class VarDecl(Decl):
+
+    def __init__(self, name, type, exp):
+        super().__init__()
+        assert isinstance(name, str), "variable name must be a string"
+        assert isinstance(type, Type) or type is None, \
+            "type must be a Type instance or None"
+        assert isinstance(exp, Node) or exp is None, \
+            "expression must be a Node instance or None"
+        self.name = name
+        self.type = type
+        self.exp = exp
+        self.children = [c for c in [type, exp] if c is not None]
+
+
+class FunDecl(Decl):
+
+    def __init__(self, name, args, type, exp):
+        super().__init__()
+        assert isinstance(name, str), "function name must be a string"
+        assert isinstance(args, list), "arguments must be a list"
+        for arg in args:
+            assert isinstance(arg, VarDecl), \
+              "arguments must be a list of VarDecl instances"
+        assert isinstance(type, Type) or type is None, \
+            "type must be a Type instance or None"
+        assert isinstance(exp, Node), "expression must be a Node instance"
+        self.name = name
+        self.args = args
+        self.type = type
+        self.exp = exp
+        self.children = [c for c in args + [type, exp] if c is not None]
+
+
+class FunCall(Node):
+
+    def __init__(self, identifier, params):
+        super().__init__()
+        assert isinstance(identifier, Identifier), \
+            "function name must be an Identifier instance"
+        assert isinstance(params, list), \
+            "parameters must be a list"
+        for param in params:
+            assert isinstance(param, Node), \
+                "parameters must be a list of Node instances"
+        self.identifier = identifier
+        self.params = params
+        self.children = [identifier] + params

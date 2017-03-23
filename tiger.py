@@ -7,6 +7,10 @@ from parser.parser import parse
 import sys
 
 parser = OptionParser()
+parser.add_option("-b", "--bind",
+                  help="invoke the binder",
+                  action="store_true", default=False,
+                  dest="bind")
 parser.add_option("-d", "--dump",
                   help="dump input file to output",
                   action="store_true", default=False,
@@ -37,9 +41,13 @@ else:
 
 tree = parse(content)
 
+if options.bind:
+    from semantics.binder import Binder
+    tree.accept(Binder())
+
 if options.dump:
     from parser.dumper import Dumper
-    print(tree.accept(Dumper(semantics=False)))
+    print(tree.accept(Dumper(options.bind)))
 
 if options.eval:
     from ast.evaluator import Evaluator
