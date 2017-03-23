@@ -77,7 +77,53 @@ def t_NUMBER(t):
     t.value = int(t.value)
     return t
 
+## Comments
+# Declare the state
+states = (
+    ('ccomment','exclusive'),
+)
+
+# Match the first /*. Enter ccoment state.
+def t_begin_ccomment(t):
+    r'\/\*'
+    t.lexer.code_start = t.lexer.lexpos        # Record the starting position
+    t.lexer.level = 1                          # Initial brace level
+    t.lexer.push_state('ccomment')                     # Enter 'ccoment' state
+
+# Rules for the ccoment state
+def t_ccomment_lcomment(t):     
+    r'\/\*'
+    t.lexer.level +=1                
+    t.lexer.push_state('ccomment')
+
+def t_ccomment_rcomment(t):
+    r'\*\/'
+    t.lexer.level -=1
+    t.lexer.pop_state()
+    if t.lexer.level == 0:
+        t.lexer.begin('INITIAL')
+
+def t_comment(t):
+    r'\/\/.*'
+    pass
+
+# Ignored characters (whitespace)
+t_ccomment_ignore = " \t\n"
+
+# For bad characters, we just skip over it
+def t_ccomment_error(t):
+    t.lexer.skip(1)
+
 def t_error(t):
     raise lex.LexError("unknown token %s" % t.value, t.value)
+
+def t_ANY_eof(t):
+    try:
+        if t.lexer.level != 0:
+            print("Make sure that comments /* */ are correct")
+            import sys
+            sys.exit(1)
+    except AttributeError:
+        pass
 
 lexer = lex.lex()

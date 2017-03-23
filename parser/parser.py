@@ -10,7 +10,8 @@ precedence = (
     ('left', 'AND'),
     ('nonassoc', 'SMALLER', 'SMALLEROREQUALS', 'BIGGER', 'BIGGEROREQUALS', 'EQUAL', 'DIFFERENT'),
     ('left', 'PLUS', 'MINUS'),
-    ('left', 'TIMES', 'DIVIDE')
+    ('left', 'TIMES', 'DIVIDE'),
+    ('right', 'UMINUS')
 )
 
 def p_expression_binop(p):
@@ -39,6 +40,10 @@ def p_expression_number(p):
 def p_expression_identifier(p):
     'expression : ID'
     p[0] = Identifier(p[1])
+
+def p_expression_uminus(p):
+    'expression : MINUS expression %prec UMINUS'
+    p[0] = BinaryOperator(p[1], IntegerLiteral(0), p[2])
 
 #### If/then/else structure
 def p_expression_ifthenelse(p):
