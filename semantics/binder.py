@@ -66,22 +66,65 @@ class Binder(Visitor):
         else:
             raise BindException("name not found: %s" % name)
 
+    @visitor(None)
+    def visit(self, node):
+        raise BindException("unable to bind %s" % node)
+
+    @visitor(IntegerLiteral)
+    def visit(self, i):
+        pass
+
+    @visitor(BinaryOperator)
+    def visit(self, binop):
+        binop.left.accept(self)
+        binop.right.accept(self)
+
+    @visitor(Let)
+    def visit(self, let):
+        self.push_new_scope()
+        for decl in let.decls:
+            decl.accept(self)
+        for expr in let.exps:
+            expr.accept(self)
+        self.pop_scope()
+   
+    @visitor(Identifier)
+    def visit(self, id):
+        decl = self.lookup(id)
+        if isinstance(decl, FunDecl):
+            raise BindException("Function name cannot be used as a variable name")
+
+    @visitor(IfThenElse)
+    def visit(self, ifthenelse):
+        ifthenelse.condition.accept(self)
+        ifthenelse.then_part.accept(self)
+        if ifthenelse.else_part:
+            ifthenelse.else_part.accept(self)
+
     @visitor(VarDecl)
     def visit(self, vardecl):
         if vardecl.exp != None:
             vardecl.exp.accept(self)
         self.add_binding(vardecl)
 
-    @visitor(Let)
-    def visit(self, let):
-        for decl in let.decls:
-                self.add_binding(decl)
-        for expr in let.exps:
-            if isinstance(expr, Let):
-                self.depth += 1
-                self.visit(expr)
-                self.depth -= 1
-            if isinstance(expr, FunCall):
-                self.lookup(expr.identifier)
-            else:
-                self.lookup(expr)
+    @visitor(FunDecl)
+    def visit(self, func):
+        self.add_binding(func)
+        self.push_new_scope()
+        self.depth += 1
+        for arg in func.args:
+            self.add_binding(arg)
+        func.exp.accept(self)
+        self.depth -= 1
+        self.pop_scope()
+
+    @visitor(FunCall)
+    def visit(self, func):
+        fundecl = self.lookup(func.identifier)
+        if isinstance(fundecl, FunDecl):
+            if len(fundecl.args) != len(func.params):
+                raise BindException("Wrong number of parameters")
+            for param in func.params:
+                param.accept(self)
+        else:
+            raise BindException("Function identifier unknown")

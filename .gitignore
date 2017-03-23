@@ -1,0 +1,5 @@
+*.pyc
+common/
+*.out
+parser/parsetab.py
+semantics/__init__.py
