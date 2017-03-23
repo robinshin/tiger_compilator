@@ -32,9 +32,9 @@ class Dumper(Visitor):
     @visitor(VarDecl)
     def visit(self, decl):
         if decl.type == None:
-            return "var %s" % decl.name + "/*e*/" if decl.escapes else "" + ":= %s" % decl.exp.accept(self)
+            return "var %s" % decl.name + ("/*e*/" if decl.escapes else "") + " := %s" % decl.exp.accept(self)
         else:
-            return "var %s" % decl.name + "/*e*/" if decl.escapes else "" + ": %s := %s" % (decl.type.typename, decl.exp.accept(self))
+            return "var %s" % decl.name + ("/*e*/" if decl.escapes else "") + ": %s := %s" % (decl.type.typename, decl.exp.accept(self))
 
     @visitor(FunDecl)
     def visit(self, func):
