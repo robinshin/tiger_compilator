@@ -120,6 +120,12 @@ def p_assignment(p):
     '''expression : ID ASSIGN expression'''
     p[0] = Assignment(Identifier(p[1]), p[3])
 
+### While
+def p_while(p):
+    '''expression : WHILE expression DO expression'''
+    p[0] = While(p[2], p[4]) 
+
+
 def p_error(p):
     import sys
     sys.stderr.write("no way to analyze %s\n" % p)

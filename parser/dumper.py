@@ -95,6 +95,10 @@ class Dumper(Visitor):
             i += 1
         return ("(" if length != 1 else "") + "%s" % exps + (")" if length != 1 else "")
 
+    @visitor(While)
+    def visit(self, whi):
+        return "while %s do %s" % (whi.condition.accept(self), whi.exp.accept(self))
+
     @visitor(Assignment)
     def visit(self, ass):
         return "%s := %s" % (ass.identifier.accept(self), ass.exp.accept(self))

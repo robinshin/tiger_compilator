@@ -153,6 +153,11 @@ class Binder(Visitor):
         for exp in exprs.exps:
             exp.accept(self)
 
+    @visitor(While)
+    def visit(self, whi):
+        whi.condition.accept(self)
+        whi.exp.accept(self)
+
     @visitor(Assignment)
     def visit(self, ass):
         decl = self.lookup(ass.identifier)
