@@ -25,6 +25,26 @@ class Dumper(Visitor):
         return "(%s %s %s)" % \
                (binop.left.accept(self), binop.op, binop.right.accept(self))
 
+    @visitor(Let)
+    def visit(self, let):
+        decls = ''
+        expr = ''
+        length = len(let.decls)
+        for decl in let.decls:
+            decls += decl.accept(self) + ('\n' if length != 1 else '')
+        for exp in let.exps:
+            expr += exp.accept(self)
+        return "let %s in %s end" % (decls, expr) if length == 1 else "let\n%sin\n%s\nend" %(decls, expr)
+
+    @visitor(Identifier)
+    def visit(self, id):
+        if self.semantics:
+            diff = id.depth - id.decl.depth
+            scope_diff = "/*%d*/" % diff if diff else ''
+        else:
+            scope_diff = ''
+        return '%s%s' % (id.name, scope_diff)
+
     @visitor(IfThenElse)
     def visit(self, ifthenelse):
         return "if %s then %s else %s" % (ifthenelse.condition.accept(self), ifthenelse.then_part.accept(self), ifthenelse.else_part.accept(self))
@@ -39,11 +59,11 @@ class Dumper(Visitor):
     @visitor(FunDecl)
     def visit(self, func):
         args = ''
-        size = len(func.args)
+        length = len(func.args)
         i = 1
-        if size != 0:
+        if length != 0:
             for arg in func.args:
-                args += "%s: %s" % (arg.name, arg.type.typename) + (", " if i != size else "")
+                args += "%s: %s" % (arg.name, arg.type.typename) + (", " if i != length else "")
                 i += 1
 
         if func.type == None:
@@ -51,33 +71,23 @@ class Dumper(Visitor):
         else:
             return "function %s(%s): %s = %s" % (func.name, args, func.type.typename, func.exp.accept(self))
 
-    @visitor(Let)
-    def visit(self, let):
-        decls = ''
-        expr = ''
-        size = len(let.decls)
-        for decl in let.decls:
-            decls += decl.accept(self) + ('\n' if size != 1 else '')
-        for exp in let.exps:
-            expr += exp.accept(self)
-        return "let %s in %s end" % (decls, expr) if size == 1 else "let\n%sin\n%s\nend" %(decls, expr)
-
-    @visitor(Identifier)
-    def visit(self, id):
-        if self.semantics:
-            diff = id.depth - id.decl.depth
-            scope_diff = "/*%d*/" % diff if diff else ''
-        else:
-            scope_diff = ''
-        return '%s%s' % (id.name, scope_diff)
-
     @visitor(FunCall)
     def visit(self, func):
         params = ''
-        size = len(func.params)
+        length = len(func.params)
         i = 1
-        if size != 0:
+        if length != 0:
             for param in func.params:
-                params += param.accept(self) + (", " if i != size else "")
+                params += param.accept(self) + (", " if i != length else "")
                 i = i + 1
         return "%s(%s)" % (func.identifier.name, params)
+
+    @visitor(SeqExp)
+    def visit(self, exprs):
+        length = len(exprs.exps)
+        exps = ''
+        i = 1
+        for expr in exprs.exps:
+            exps += "%s" % expr.accept(self) + ("; " if i != length else "")
+            i += 1
+        return ("(" if length != 1 else "") + "%s" % exps + (")" if length != 1 else "")

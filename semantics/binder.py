@@ -147,3 +147,8 @@ class Binder(Visitor):
                 param.accept(self)
         else:
             raise BindException("Function identifier unknown")
+
+    @visitor(SeqExp)
+    def visit(self, exprs):
+        for exp in exprs.exps:
+            exp.accept(self)
