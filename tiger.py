@@ -11,6 +11,10 @@ parser.add_option("-b", "--bind",
                   help="invoke the binder",
                   action="store_true", default=False,
                   dest="bind")
+parser.add_option("-c", "--canon",
+                  help="canonicalize the IR tree",
+                  action="store_true", default=False,
+                  dest="canon")
 parser.add_option("-d", "--dump",
                   help="dump input file to output",
                   action="store_true", default=False,
@@ -23,6 +27,14 @@ parser.add_option("-e", "--eval",
                   help="evaluate input file to output",
                   action="store_true", default=False,
                   dest="eval")
+parser.add_option("-i", "--ir",
+                  help="invoke IR translator",
+                  action="store_true", default=False,
+                  dest="ir")
+parser.add_option("-I", "--irvm",
+                  help="use IRVM target (default: ARM)",
+                  action="store_true", default=False,
+                  dest="irvm")
 parser.add_option("-t", "--type",
                   help="invoke the typer",
                   action="store_true", default=False,
@@ -31,6 +43,8 @@ parser.usage = """%prog [options] [file]"""
 parser.description = "Compile a Tiger program (or standard input)"
 
 (options, args) = parser.parse_args()
+options.ir |= options.canon
+options.type |= options.ir
 
 if len(args) > 1 or (options.expression and len(args) > 0):
     parser.print_help(file=sys.stderr)
@@ -52,7 +66,24 @@ if options.bind or options.type:
         from typer.typer import Typer
         Typer().run(tree, True)
 
-if options.dump:
+if options.ir:
+    if options.irvm:
+        from irvm.frame import IrvmFrame as Frame
+    else:
+        from arm.frame import ArmFrame as Frame
+    from ir.translate import Translator
+    funcs = Translator(Frame).run(tree)
+    if options.canon:
+        from ir.canonical import canon
+        from ir.hoist import HoistCalls
+        H = HoistCalls()
+        for (f, (frame, stm)) in funcs.items():
+            funcs[f] = (frame, canon(stm.accept(H)))
+    if options.dump:
+        from ir.dumper import Dumper
+        for (frame, stm) in funcs.values():
+            print(stm.accept(Dumper()))
+elif options.dump:
     from parser.dumper import Dumper
     print(tree.accept(Dumper(options.bind)))
 

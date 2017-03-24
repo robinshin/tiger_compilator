@@ -241,3 +241,9 @@ class Assignment(Node):
         self.identifier = identifier
         self.exp = exp
         self.children = [identifier, exp]
+
+
+class Intrinsics(Node):
+
+    def __init__(self):
+        super().__init__()
