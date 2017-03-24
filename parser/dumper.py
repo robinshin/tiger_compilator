@@ -29,12 +29,15 @@ class Dumper(Visitor):
     def visit(self, let):
         decls = ''
         expr = ''
-        length = len(let.decls)
+        length_decls = len(let.decls)
+        length_exps = len(let.exps)
+        i = 1
         for decl in let.decls:
-            decls += decl.accept(self) + ('\n' if length != 1 else '')
+            decls += decl.accept(self) + ('\n' if length_decls != 1 else '')
         for exp in let.exps:
-            expr += exp.accept(self)
-        return "let %s in %s end" % (decls, expr) if length == 1 else "let\n%sin\n%s\nend" %(decls, expr)
+            expr += exp.accept(self) + ("; " if i != length_exps else "")
+            i += 1
+        return "let %s in %s end" % (decls, expr) if length_decls == 1 else "let\n%sin\n%s\nend" %(decls, expr)
 
     @visitor(Identifier)
     def visit(self, id):
@@ -66,7 +69,7 @@ class Dumper(Visitor):
                 args += "%s: %s" % (arg.name, arg.type.typename) + (", " if i != length else "")
                 i += 1
 
-        if func.type == None:
+        if func.type == None or func.type.typename == "void":
             return "function %s(%s) = %s" % (func.name, args, func.exp.accept(self))
         else:
             return "function %s(%s): %s = %s" % (func.name, args, func.type.typename, func.exp.accept(self))

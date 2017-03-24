@@ -95,8 +95,9 @@ def p_fun_decl_arg(p):
 
 #### Let/in/end structure
 def p_expression_let(p):
-    '''expression : LET decls IN expression END'''
-    p[0] = Let(p[2], [p[4]])
+    '''expression : LET decls IN seq_expression END
+                  | LET decls IN END'''
+    p[0] = Let(p[2], p[4]) if len(p) == 6 else Let(p[2], [])
 
 #### Function call
 def p_fun_call(p):
