@@ -50,7 +50,7 @@ class Dumper(Visitor):
 
     @visitor(IfThenElse)
     def visit(self, ifthenelse):
-        return "if %s then %s else %s" % (ifthenelse.condition.accept(self), ifthenelse.then_part.accept(self), ifthenelse.else_part.accept(self))
+        return "if %s then %s" % (ifthenelse.condition.accept(self), ifthenelse.then_part.accept(self)) + (" else %s" % ifthenelse.else_part.accept(self) if (ifthenelse.else_part is not None) else "")
 
     @visitor(VarDecl)
     def visit(self, decl):

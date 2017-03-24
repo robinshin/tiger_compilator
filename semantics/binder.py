@@ -117,7 +117,7 @@ class Binder(Visitor):
     def visit(self, ifthenelse):
         ifthenelse.condition.accept(self)
         ifthenelse.then_part.accept(self)
-        if ifthenelse.else_part:
+        if ifthenelse.else_part is not None:
             ifthenelse.else_part.accept(self)
 
     @visitor(VarDecl)

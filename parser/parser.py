@@ -53,8 +53,9 @@ def p_seq_expression(p):
 
 #### If/then/else structure
 def p_expression_ifthenelse(p):
-    'expression : IF expression THEN expression ELSE expression'
-    p[0] = IfThenElse(p[2], p[4], p[6])
+    '''expression : IF expression THEN expression ELSE expression
+                  | IF expression THEN expression'''
+    p[0] = IfThenElse(p[2], p[4], p[6]) if len(p) == 7 else IfThenElse(p[2], p[4], None)
 
 #### Declarations
 def p_decls(p):
