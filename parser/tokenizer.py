@@ -34,7 +34,8 @@ tokens = ('END', 'IN', 'LET', 'VAR',
           'IF', 'THEN', 'ELSE',
           'FUNCTION', 'INT',
           'WHILE', 'DO',
-          'FOR', 'TO')
+          'FOR', 'TO',
+          'BREAK')
 
 t_PLUS = r'\+'
 t_TIMES = r'\*'

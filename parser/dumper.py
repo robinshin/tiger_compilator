@@ -103,6 +103,10 @@ class Dumper(Visitor):
     def visit(self, fo):
         return "for %s := %s to %s do %s" % (fo.indexdecl.name, fo.low_bound.accept(self), fo.high_bound.accept(self), fo.exp.accept(self))
 
+    @visitor(Break)
+    def visit(self, bre):
+        return "break"
+
     @visitor(Assignment)
     def visit(self, ass):
         return "%s := %s" % (ass.identifier.accept(self), ass.exp.accept(self))

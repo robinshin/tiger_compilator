@@ -167,6 +167,11 @@ class Binder(Visitor):
        fo.exp.accept(self)
        self.pop_scope()
 
+    @visitor(Break)
+    def visit(self, bre):
+        bre.loop = self.current_loop()
+        self.pop_loop()
+
     @visitor(Assignment)
     def visit(self, ass):
         decl = self.lookup(ass.identifier)

@@ -130,6 +130,12 @@ def p_for(p):
     '''expression : FOR ID ASSIGN expression TO expression DO expression'''
     p[0] = For(IndexDecl(p[2]), p[4], p[6], p[8])
 
+### Break
+def p_break(p):
+    '''expression : BREAK'''
+    p[0] = Break()
+
+
 def p_error(p):
     import sys
     sys.stderr.write("no way to analyze %s\n" % p)
