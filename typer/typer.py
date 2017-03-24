@@ -138,7 +138,14 @@ class Typer(Visitor):
     def visit(self, call):
         self.visit_all(call.children)
         decl = call.identifier.decl
-        self.merge(call, decl)
+        # If the called function is an intrinsic, merge it with its declared
+        # type as the function itself has not been merged with its type since
+        # it does not belong to the AST tree (it has only been injected in the
+        # main scope).
+        if isinstance(decl.exp, Intrinsics):
+            self.merge(call, decl.type)
+        else:
+            self.merge(call, decl)
         for (a, p) in zip(decl.args, call.params):
             self.merge(a, p)
 
