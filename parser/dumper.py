@@ -55,9 +55,9 @@ class Dumper(Visitor):
     @visitor(VarDecl)
     def visit(self, decl):
         if decl.type == None:
-            return "var %s" % decl.name + ("/*e*/" if decl.escapes else "") + " := %s" % decl.exp.accept(self)
+            return "var %s" % decl.name + ("/*e*/" if decl.escapes and self.semantics else "") + " := %s" % decl.exp.accept(self)
         else:
-            return "var %s" % decl.name + ("/*e*/" if decl.escapes else "") + ": %s := %s" % (decl.type.typename, decl.exp.accept(self))
+            return "var %s" % decl.name + ("/*e*/" if decl.escapes and self.semantics else "") + ": %s := %s" % (decl.type.typename, decl.exp.accept(self))
 
     @visitor(FunDecl)
     def visit(self, func):
@@ -94,3 +94,7 @@ class Dumper(Visitor):
             exps += "%s" % expr.accept(self) + ("; " if i != length else "")
             i += 1
         return ("(" if length != 1 else "") + "%s" % exps + (")" if length != 1 else "")
+
+    @visitor(Assignment)
+    def visit(self, ass):
+        return "%s := %s" % (ass.identifier.accept(self), ass.exp.accept(self))

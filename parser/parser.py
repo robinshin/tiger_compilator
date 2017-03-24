@@ -114,7 +114,10 @@ def p_fun_call_argssome(p):
                          | fun_call_argssome COMMA expression'''
     p[0] = [p[1]] if len(p) == 2 else p[1] + [p[3]]
 
-
+#### Assignment
+def p_assignment(p):
+    '''expression : ID ASSIGN expression'''
+    p[0] = Assignment(Identifier(p[1]), p[3])
 
 def p_error(p):
     import sys

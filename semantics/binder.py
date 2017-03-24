@@ -152,3 +152,10 @@ class Binder(Visitor):
     def visit(self, exprs):
         for exp in exprs.exps:
             exp.accept(self)
+
+    @visitor(Assignment)
+    def visit(self, ass):
+        decl = self.lookup(ass.identifier)
+        if not isinstance(decl, VarDecl):
+            raise BindException("Affected variable must be a VarDecl type")
+        ass.exp.accept(self)
