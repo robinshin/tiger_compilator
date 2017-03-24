@@ -99,6 +99,10 @@ class Dumper(Visitor):
     def visit(self, whi):
         return "while %s do %s" % (whi.condition.accept(self), whi.exp.accept(self))
 
+    @visitor(For)
+    def visit(self, fo):
+        return "for %s := %s to %s do %s" % (fo.indexdecl.name, fo.low_bound.accept(self), fo.high_bound.accept(self), fo.exp.accept(self))
+
     @visitor(Assignment)
     def visit(self, ass):
         return "%s := %s" % (ass.identifier.accept(self), ass.exp.accept(self))
