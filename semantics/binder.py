@@ -101,8 +101,10 @@ class Binder(Visitor):
     @visitor(Let)
     def visit(self, let):
         self.push_new_scope()
+        self.push_new_loop(None)
         for decl in let.decls:
             decl.accept(self)
+        self.pop_loop()
         for expr in let.exps:
             expr.accept(self)
         self.pop_scope()
@@ -156,21 +158,26 @@ class Binder(Visitor):
     @visitor(While)
     def visit(self, whi):
         whi.condition.accept(self)
+        self.push_new_loop(whi)
         whi.exp.accept(self)
+        self.pop_loop()
 
     @visitor(For)
     def visit(self, fo):
-       fo.low_bound.accept(self)
-       fo.high_bound.accept(self)
-       self.push_new_scope()
-       self.add_binding(fo.indexdecl)
-       fo.exp.accept(self)
-       self.pop_scope()
+        fo.low_bound.accept(self)
+        fo.high_bound.accept(self)
+        self.push_new_scope()
+        self.add_binding(fo.indexdecl)
+        self.push_new_loop(fo)
+        fo.exp.accept(self)
+        self.pop_loop()
+        self.pop_scope()
 
     @visitor(Break)
     def visit(self, bre):
         bre.loop = self.current_loop()
-        self.pop_loop()
+        if not bre.loop:
+            raise BindException("Break called outside a loop")
 
     @visitor(Assignment)
     def visit(self, ass):
