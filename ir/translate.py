@@ -367,10 +367,10 @@ class Translator(Visitor):
     def visit(self, let):
         # Collect all the variable declarations then the body expressions
         code = self.visit_all(let.decls + let.exps)
-        # If the last element (the one to be returned) is a Nx, return a SEQ
+        # If the let expression does not return a value, return a SEQ
         # since no result is expected, otherwise return an ESEQ with the
         # result of its evaluation.
-        if isinstance(code[-1], Nx):
+        if let.type == None or let.type.typename == 'void':
             return Nx(SEQ([c.unNx() for c in code]))
         else:
             return Ex(ESEQ(SEQ([c.unNx() for c in code[:-1]]),
