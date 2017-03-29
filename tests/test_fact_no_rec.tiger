@@ -1,0 +1,8 @@
+// 3628800
+let
+    function facta(n: int, a: int) =
+        if n < 2 then a else facta(n-1, a*n)
+    function fact(n: int) = facta(n, 1)
+in
+    print_int(fact(10))
+end
