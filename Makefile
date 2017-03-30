@@ -3,18 +3,17 @@
 TIGER_FILES = $(wildcard tests/*.tiger)
 IR_FILES    = $(patsubst tests/%.tiger, /tmp/%.ir,$(TIGER_FILES))
 
-all:irmake irtests
+PRINTF  = /usr/bin/printf
 
+.PHONY:irmake
+
+all:irmake
 
 irmake: $(IR_FILES)
-irtests: irmake
 
 /tmp/%.ir : tests/%.tiger
-	./tiger.py -ciId $< > $@
-
-irtests: $(IR_FILES)
-	irvm $<
-
-.PHONY:clean
-clean:
-	rm /tmp/*.ir
+	@./tiger.py -ciId $^ > $@
+	@$(PRINTF) "Running $@\nResult : "
+	@irvm $@
+	@$(PRINTF) "\n"
+	@rm $@
