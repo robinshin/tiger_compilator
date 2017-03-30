@@ -1,0 +1,8 @@
+// 45765225
+let
+    function fibo(n: int) = if n < 2 then n else fibo(n-1) + fibo(n-2)
+    function square(n: int) = n * n
+    function fibo_squared(n: int) = square(fibo(n))
+in
+    print_int(fibo_squared(20))
+end

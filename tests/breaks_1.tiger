@@ -1,4 +1,4 @@
-// 45
+// 1225
 let
     function test_break_for(n: int) =
         let
@@ -8,5 +8,5 @@ let
             a
         end
 in
-    print_int(test_break_for(10))
+    print_int(test_break_for(50))
 end
