@@ -15,5 +15,7 @@ irmake: $(IR_FILES)
 	@./tiger.py -ciId $^ > $@
 	@$(PRINTF) "Running $@\nResult : "
 	@irvm $@
+	@$(PRINTF) "\nExpected : "
+	@cat $^ | grep "//"
 	@$(PRINTF) "\n"
 	@rm $@
