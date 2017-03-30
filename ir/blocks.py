@@ -22,7 +22,7 @@ def reorder_blocks(seq, frame):
 
     examinated_blocks = blocks[0]
     del blocks[0]
-    while len(blocks) != 0:
+    while len(blocks) > 0:
         current_block_type = examinated_blocks[-1]
         if isinstance(current_block_type, JUMP):
             current_block = current_block_type.target
@@ -49,6 +49,8 @@ def reorder_blocks(seq, frame):
             else:
                 examinated_blocks.append([Label("new_label"), JUMP(NAME(false_block.label))])
                 current_block_type.ifFalse.label = Label("new_label")
+                examinated_blocks.append(blocks[0])
+                del blocks[0]
 
 
     return seq
