@@ -1,10 +1,10 @@
-// 55
+// 45
 let
-    function simple_loop(n: int) =
+    function test_break(n: int) =
         let var a := 0 in
-            for i := 1 to 100 do if a = n then break else a := a + i;
+            for i := 1 to 100 do (if i = n then break else a := a + i);
             a
             end
 in
-    print_int(simple_loop(20))
+    print_int(test_break(10))
 end
