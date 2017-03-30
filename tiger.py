@@ -76,9 +76,10 @@ if options.ir:
     if options.canon:
         from ir.canonical import canon
         from ir.hoist import HoistCalls
+        from ir.blocks import reorder_blocks
         H = HoistCalls()
         for (f, (frame, stm)) in funcs.items():
-            funcs[f] = (frame, canon(stm.accept(H)))
+            funcs[f] = (frame, reorder_blocks(canon(stm.accept(H)), frame))
     if options.dump:
         from ir.dumper import Dumper
         for (frame, stm) in funcs.values():
