@@ -1,0 +1,12 @@
+// 13
+let
+    function test_break() =
+        let
+            var a := 13
+        in
+            while 1 do ((); break);
+            a
+        end
+in
+    print_int(test_break())
+end
