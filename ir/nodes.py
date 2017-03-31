@@ -1,5 +1,14 @@
-# List of logical binary operators.
-logical_operators = ['<', '<=', '>', '>=', '=', '<>']
+# List of logical binary operators and their inverses.
+# When adding a new logical operator, add it at the
+# beginning and add its inverse at the end, so that we
+# can match them.
+logical_operators = ["<", ">", "=", "<>", "<=", ">="]
+
+
+def inverse(op):
+    """Return the inverse of a logical operator."""
+    return logical_operators[len(logical_operators) - 1
+                             - logical_operators.index(op)]
 
 
 class Label:
