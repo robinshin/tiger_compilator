@@ -20,8 +20,10 @@ def reorder_blocks(seq, frame):
             blocks[-1].append(stm)
         previous_stm = stm
 
+    print("+++++ Avant examinated_blocks" + len(blocks))
     examinated_blocks = blocks[0]
     del blocks[0]
+    print("+++++ Après examinated_blocks" + len(blocks))
     while len(blocks) > 0:
         current_block_type = examinated_blocks[-1]
         if isinstance(current_block_type, JUMP):
@@ -36,7 +38,7 @@ def reorder_blocks(seq, frame):
             true_block = current_block_type.ifTrue
             false_block = current_block_type.ifFalse
             if false_block in blocks:
-                examinated_blocs.append(false_block)
+                examinated_blocks.append(false_block)
                 blocks.remove(false_block)
             elif true_block in blocks:
                 right_tmp = current_block_type.right
@@ -51,6 +53,9 @@ def reorder_blocks(seq, frame):
                 current_block_type.ifFalse.label = Label("new_label")
                 examinated_blocks.append(blocks[0])
                 del blocks[0]
+        else:
+            examinated_blocks.append(current_block_type)
+            blocks.remove(current_block)
 
 
     return seq
