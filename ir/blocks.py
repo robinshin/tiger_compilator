@@ -49,7 +49,7 @@ def reorder_blocks(seq, frame):
             else:
                 new_label = LABEL(Label.create(frame))
                 examinated_blocks.append([new_label, JUMP(false_block)])
-                current_block_type.ifFalse = new_label
+                current_block.ifFalse = new_label
                 examinated_blocks.append(blocks[0])
                 del blocks[0]
         ## Last block
