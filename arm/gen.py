@@ -42,7 +42,7 @@ class Gen:
         elif cjump.op == "<>":
             op = "bne"
         else:
-            raise AssertionError("unimplemented operator {}".format(op))
+            raise AssertionError("unimplemented operator {}".format(cjump.op))
         return left_stms + right_stms + [O("cmp {}, {}", srcs=[left_temp, right_temp]),
                                          O("{} {}".format(op, cjump.ifTrue.label.name),
                                            jmps=[cjump.ifTrue.label, cjump.ifFalse.label])]
