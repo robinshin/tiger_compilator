@@ -21,7 +21,7 @@ class ArmFrame(Frame):
     callee_save = list(Temp("r%d" % i) for i in range(4, 11))
 
     # List of caller save registers.
-    caller_save = list(Temp("r%d" % i) for i in range(0, 4))
+    caller_save = list(Temp("r%d" % i) for i in range(0, 4)) + [lr]
 
     def __init__(self, label):
         super().__init__(label)
