@@ -46,18 +46,17 @@ def reorder_blocks(seq, frame):
                 current_block_type.left = right_tmp
                 current_block_type.ifTrue = false_block
                 current_block_type.ifFalse = true_block
-                examinated_blocks.append(true_block)
-                blocks.remove(true_block)
+                examinated_blocks.append(current_block_type.ifFalse)
+                blocks.remove(current_block_type.ifFalse)
             else:
                 new_label = LABEL(Label.create(frame))
                 examinated_blocks.append([new_label, JUMP(false_block)])
                 current_block_type.ifFalse = new_label
                 examinated_blocks.append(blocks[0])
                 del blocks[0]
-        ## Not JUMP nor CJUMP
+        ## Last block
         else:
-            examinated_blocks.append(current_block_type)
-            examinated_blocks = blocks[0]
+            examinated_blocks.append(blocks[0])
             del blocks[0]
 
 
