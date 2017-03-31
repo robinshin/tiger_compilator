@@ -27,6 +27,10 @@ parser.add_option("-e", "--eval",
                   help="evaluate input file to output",
                   action="store_true", default=False,
                   dest="eval")
+parser.add_option("-g", "--gen",
+                  help="generate assembly code",
+                  action="store_true", default=False,
+                  dest="gen")
 parser.add_option("-i", "--ir",
                   help="invoke IR translator",
                   action="store_true", default=False,
@@ -43,7 +47,9 @@ parser.usage = """%prog [options] [file]"""
 parser.description = "Compile a Tiger program (or standard input)"
 
 (options, args) = parser.parse_args()
-options.ir |= options.canon
+options.canon |= options.gen
+options.irvm &= not options.gen
+options.ir |= options.canon | options.irvm
 options.type |= options.ir
 
 if len(args) > 1 or (options.expression and len(args) > 0):
@@ -80,7 +86,28 @@ if options.ir:
         H = HoistCalls()
         for (f, (frame, stm)) in funcs.items():
             funcs[f] = (frame, reorder_blocks(canon(stm.accept(H)), frame))
-    if options.dump:
+    if options.gen:
+        from arm.gen import Gen
+        assembly = {}
+        for (f, (frame, seq)) in funcs.items():
+            assembly[f] = (frame, seq.accept(Gen(frame)))
+        if options.dump:
+            for (f, (frame, code)) in assembly.items():
+                for i in code:
+                    defs = i.defs()
+                    if defs:
+                        defs = ["defs: {}".format(defs)]
+                    uses = i.uses()
+                    if uses:
+                        uses = ["uses: {}".format(uses)]
+                    jumps = i.jumps()
+                    if jumps:
+                        jumps = ["jumps: {}".format(jumps)]
+                    comments = ", ".join(defs + uses + jumps)
+                    if comments:
+                        comments = "; {}".format(comments)
+                    print("{!s:40} {}".format(i, comments))
+    elif options.dump:
         from ir.dumper import Dumper
         for (frame, stm) in funcs.values():
             print(stm.accept(Dumper()))
