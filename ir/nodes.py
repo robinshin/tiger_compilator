@@ -110,6 +110,9 @@ class Stm(Node):
         self.is_nop = False
 
     def commutes_with(self, sxp):
+        """Check if the current statement can be moved around the
+        given Sxp without changing the result of the Sxp evaluation."""
+        assert isinstance(sxp, Sxp)
         return self.is_nop or sxp.is_side_effect_free
 
 
