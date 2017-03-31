@@ -17,7 +17,7 @@ class HoistCalls(Visitor):
         hoisted = call.build(self.visit_all(call.kids))
         if hoisted.return_result:
             temp = TEMP(Temp.create("call"))
-            return ESEQ(MOVE(temp, call.build(self.visit_all(call.kids))),
+            return ESEQ(MOVE(temp, hoisted),
                         temp)
         return hoisted
 
