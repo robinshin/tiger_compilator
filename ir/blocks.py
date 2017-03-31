@@ -20,12 +20,11 @@ def reorder_blocks(seq, frame):
             blocks[-1].append(stm)
         previous_stm = stm
 
-    print("+++++ Avant examinated_blocks" + len(blocks))
     examinated_blocks = blocks[0]
     del blocks[0]
-    print("+++++ Après examinated_blocks" + len(blocks))
     while len(blocks) > 0:
         current_block_type = examinated_blocks[-1]
+        ## JUMP case
         if isinstance(current_block_type, JUMP):
             current_block = current_block_type.target
             if current_block in blocks:
@@ -34,6 +33,7 @@ def reorder_blocks(seq, frame):
             else:
                 examinated_blocks.append(blocks[0])
                 del blocks[0]
+        ## CJUMP case
         elif isinstance(current_block_type, CJUMP):
             true_block = current_block_type.ifTrue
             false_block = current_block_type.ifFalse
@@ -49,13 +49,16 @@ def reorder_blocks(seq, frame):
                 examinated_blocks.append(true_block)
                 blocks.remove(true_block)
             else:
-                examinated_blocks.append([Label("new_label"), JUMP(NAME(false_block.label))])
-                current_block_type.ifFalse.label = Label("new_label")
+                new_label = LABEL(Label.create(frame))
+                examinated_blocks.append([new_label, JUMP(false_block)])
+                current_block_type.ifFalse = new_label
                 examinated_blocks.append(blocks[0])
                 del blocks[0]
+        ## Not JUMP nor CJUMP
         else:
             examinated_blocks.append(current_block_type)
-            blocks.remove(current_block)
+            examinated_blocks = blocks[0]
+            del blocks[0]
 
 
     return seq

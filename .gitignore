@@ -11,3 +11,4 @@ parser/parsetab.py
 semantics/__init__.py
 semantics/test_run.py
 Makefile
+result.txt
