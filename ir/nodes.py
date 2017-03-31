@@ -110,7 +110,16 @@ class Stm(Node):
         self.is_nop = False
 
     def commutes_with(self, sxp):
+        """Check if the current statement can be moved around the
+        given Sxp without changing the result of the Sxp evaluation."""
+        assert isinstance(sxp, Sxp)
         return self.is_nop or sxp.is_side_effect_free
+
+    def jumps(self):
+        """Return a list of expressions that the current Stm
+        can jump to. The order is the one of the constructor
+        (true before false for a conditional jump for example)."""
+        return []
 
 
 class BINOP(Sxp):
@@ -180,6 +189,9 @@ class CJUMP(Stm):
         return CJUMP(self.op, kids[0], kids[1],
                      self.ifTrue, self.ifFalse)
 
+    def jumps(self):
+        return [self.ifTrue, self.ifFalse]
+
 
 class CONST(Sxp):
     """Integer constant."""
@@ -232,6 +244,9 @@ class JUMP(Stm):
 
     def build(self, kids):
         return JUMP(kids[0])
+
+    def jumps(self):
+        return [self.target]
 
 
 class LABEL(Stm):
