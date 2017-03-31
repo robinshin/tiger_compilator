@@ -23,31 +23,29 @@ def reorder_blocks(seq, frame):
     examinated_blocks = blocks[0]
     del blocks[0]
     while len(blocks) > 0:
-        current_block_type = examinated_blocks[-1]
+        current_block = examinated_blocks[-1]
         ## JUMP case
-        if isinstance(current_block_type, JUMP):
-            current_block = current_block_type.target
-            if current_block in blocks:
-                examinated_blocks.append(current_block)
-                blocks.remove(current_block)
+        if isinstance(current_block, JUMP):
+            current_block_target = current_block.target
+            if current_block_target in blocks:
+                examinated_blocks.append(current_block_target)
+                blocks.remove(current_block_target)
             else:
                 examinated_blocks.append(blocks[0])
                 del blocks[0]
         ## CJUMP case
-        elif isinstance(current_block_type, CJUMP):
-            true_block = current_block_type.ifTrue
-            false_block = current_block_type.ifFalse
+        elif isinstance(current_block, CJUMP):
+            true_block = current_block.ifTrue
+            false_block = current_block.ifFalse
             if false_block in blocks:
                 examinated_blocks.append(false_block)
                 blocks.remove(false_block)
             elif true_block in blocks:
-                right_tmp = current_block_type.right
-                current_block_type.right = current_block_type.left
-                current_block_type.left = right_tmp
-                current_block_type.ifTrue = false_block
-                current_block_type.ifFalse = true_block
-                examinated_blocks.append(current_block_type.ifFalse)
-                blocks.remove(current_block_type.ifFalse)
+                inverse(current_block.op)             
+                current_block.ifTrue = false_block
+                current_block.ifFalse = true_block
+                examinated_blocks.append(true_block)
+                blocks.remove(true_block)
             else:
                 new_label = LABEL(Label.create(frame))
                 examinated_blocks.append([new_label, JUMP(false_block)])
@@ -58,6 +56,5 @@ def reorder_blocks(seq, frame):
         else:
             examinated_blocks.append(blocks[0])
             del blocks[0]
-
 
     return seq
