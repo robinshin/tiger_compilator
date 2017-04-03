@@ -1,0 +1,12 @@
+// 1225
+let
+    function test_break_for(n: int) =
+        let
+            var a := 0
+        in
+            for i := 1 to 100 do (if i = n then break else a := a + i);
+            a
+        end
+in
+    print_int(test_break_for(50))
+end

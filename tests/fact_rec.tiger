@@ -1,0 +1,7 @@
+// 362880
+let
+    function fact(n: int) =
+        if n < 2 then n else n*fact(n-1)
+in
+    print_int(fact(9))
+end

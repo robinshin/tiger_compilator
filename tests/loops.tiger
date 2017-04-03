@@ -1,0 +1,10 @@
+// 210
+let
+    function simple_loop(n: int) =
+        let var a := 0 in
+            for i := 1 to n do a := a + i;
+            a
+            end
+in
+    print_int(simple_loop(20))
+end

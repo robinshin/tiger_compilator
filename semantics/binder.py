@@ -30,7 +30,23 @@ class Binder(Visitor):
         self.depth = 0
         self.scopes = []
         self.push_new_scope()
+        self.add_intrinsics()
         self.break_stack = [None]
+
+    def add_intrinsics(self):
+        """Add intrinsics functions, which exist by default but do not
+        need to be analyzed."""
+        self.add_binding(FunDecl("print_int",
+                                 [VarDecl("i", Type('int'), None)],
+                                 Type('void'),
+                                 Intrinsics()))
+        self.add_binding(FunDecl("exit",
+                                 [VarDecl("code", Type('int'), None)],
+                                 Type('void'),
+                                 Intrinsics()))
+        # Push a new scope so that the intrinsics can be overriden if
+        # needed.
+        self.push_new_scope()
 
     def push_new_scope(self):
         """Push a new scope on the scopes stack."""

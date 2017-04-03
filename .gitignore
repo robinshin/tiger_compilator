@@ -1,5 +1,14 @@
 *.pyc
-common/
 *.out
+common/
+scripts/
+step1/
+step2/
+step3/
+step4/
+support/
 parser/parsetab.py
 semantics/__init__.py
+semantics/test_run.py
+Makefile
+result.txt

@@ -1,0 +1,12 @@
+// 120
+let
+    function fact(n: int) =
+        let
+            var result := 1
+        in
+            while 1 do (if n < 2 then break; result := result * n; n := n - 1);
+            result
+        end
+in
+    print_int(fact(5))
+end

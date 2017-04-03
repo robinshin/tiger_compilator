@@ -1,0 +1,8 @@
+// 215
+let
+    function multiply(p: int) = 2 * p
+    function add(a: int, b: int) = multiply(a) + b
+    function linear(a: int, x: int) = add(x, a)
+in
+    print_int(linear(15, 100))
+end

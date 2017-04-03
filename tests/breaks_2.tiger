@@ -1,0 +1,13 @@
+// 5050
+let
+    function test_break_while(n: int): int =
+        let
+            var a := 0
+            var i := 1
+        in
+            while 1 do if i = (n + 1) then break else (a := a + i; i := i + 1);
+            a
+        end
+in
+    print_int(test_break_while(100))
+end
