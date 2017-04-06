@@ -51,6 +51,9 @@ class Frame:
     # List of caller save registers temps.
     caller_save = []
 
+    # Does the architecture use a link register for return addresses?
+    has_lr = True
+
     def __init__(self, label):
         assert isinstance(label, Label), "label must be a Label"
         self.label = label
@@ -139,7 +142,7 @@ class Frame:
             [MOVE(access.toSxp(TEMP(self.fp)),
                   TEMP(self.param_regs[idx + 1])
                   if idx < self.max_params_in_regs - 1
-                  else InFrame((idx - self.max_params_in_regs + 1) *
+                  else InFrame((idx - self.max_params_in_regs + (2 if self.has_lr else 3)) *
                                self.word_size).toSxp(TEMP(self.fp)))
              for (idx, access) in enumerate(self.param_access)]
 
