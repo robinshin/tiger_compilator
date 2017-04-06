@@ -8,7 +8,9 @@ class IrvmFrame(Frame):
     # Word size for the target architecture.
     word_size = 4
 
-    param_regs = [Temp("i%d" % i) for i in range(4)]
+    # Infinite number of parameter registers in IRVM. 128 is close
+    # enough to infinity, right?
+    param_regs = [Temp("i%d" % i) for i in range(128)]
 
     # Predefined registers used at many places.
     rv = Temp("rv")
