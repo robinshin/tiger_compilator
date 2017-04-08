@@ -55,26 +55,6 @@ class Gen:
                                          O("{} {}".format(op, cjump.ifTrue.label.name),
                                            jmps=[cjump.ifTrue.label, cjump.ifFalse.label])]
 
-    @visitor(BINOP)
-    def visit(self, binop):
-        # Register used to stock result
-        temp = Temp.create("binop")
-        # Binop evaluation
-        left_stms, left_temp = binop.left.accept(self)
-        right_stms, right_temp = binop.right.accept(self)
-        if binop.op == "+":
-            op = "add"
-        elif binop.op == "-":
-            op = "sub"
-        elif binop.op == "*":
-            op = "mul"
-        elif binop.op == "/":
-            op = "sdiv"
-        else:
-            raise AssertionError("unimplemented operator {}".format(binop.op))
-        # Determination of instructions to do
-        stms = left_stms + right_stms + [O("{} {}, {}, {}".format(op, temp, left_temp, right_temp))]
-        return stms, temp
 
     @visitor(LABEL)
     def visit(self, label):
@@ -114,3 +94,25 @@ class Gen:
     def visit(self, const):
         temp = Temp.create("const")
         return [O("mov {{}}, #{}".format(const.value), dsts=[temp])], temp
+
+
+    @visitor(BINOP)
+    def visit(self, binop):
+        # Register used to stock result
+        temp = Temp.create("binop")
+        # Binop evaluation
+        left_stms, left_temp = binop.left.accept(self)
+        right_stms, right_temp = binop.right.accept(self)
+        if binop.op == "+":
+            op = "add"
+        elif binop.op == "-":
+            op = "sub"
+        elif binop.op == "*":
+            op = "mul"
+        elif binop.op == "/":
+            op = "sdiv"
+        else:
+            raise AssertionError("unimplemented operator {}".format(binop.op))
+        # Determination of instructions to do
+        stms = left_stms + right_stms + [O("{} {}, {}, {}".format(op, temp, left_temp, right_temp))]
+        return stms, temp
