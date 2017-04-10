@@ -55,7 +55,6 @@ class Gen:
                                          O("{} {}".format(op, cjump.ifTrue.label.name),
                                            jmps=[cjump.ifTrue.label, cjump.ifFalse.label])]
 
-
     @visitor(LABEL)
     def visit(self, label):
         l = L("{}:".format(label.label), label.label)
@@ -116,3 +115,7 @@ class Gen:
         # Determination of instructions to do
         stms = left_stms + right_stms + [O("{} {}, {}, {}".format(op, temp, left_temp, right_temp))]
         return stms, temp
+
+#    @visitor(CALL)
+#    def visit(self, func):
+
