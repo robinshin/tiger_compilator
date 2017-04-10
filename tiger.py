@@ -43,11 +43,18 @@ parser.add_option("-t", "--type",
                   help="invoke the typer",
                   action="store_true", default=False,
                   dest="type")
+parser.add_option("-v", "--verbose",
+                  help="be verbose",
+                  action="store_true", default=False,
+                  dest="verbose")
 parser.usage = """%prog [options] [file]"""
 parser.description = "Compile a Tiger program (or standard input)"
 
 (options, args) = parser.parse_args()
 options.canon |= options.gen
+if options.irvm and options.gen:
+    print("Error: IRVM cannot be selected for code generation", file=sys.stderr)
+    sys.exit(1)
 options.irvm &= not options.gen
 options.ir |= options.canon | options.irvm
 options.type |= options.ir
@@ -94,19 +101,7 @@ if options.ir:
         if options.dump:
             for (f, (frame, code)) in assembly.items():
                 for i in code:
-                    defs = i.defs()
-                    if defs:
-                        defs = ["defs: {}".format(defs)]
-                    uses = i.uses()
-                    if uses:
-                        uses = ["uses: {}".format(uses)]
-                    jumps = i.jumps()
-                    if jumps:
-                        jumps = ["jumps: {}".format(jumps)]
-                    comments = ", ".join(defs + uses + jumps)
-                    if comments:
-                        comments = "; {}".format(comments)
-                    print("{!s:40} {}".format(i, comments))
+                    print(i.dump(options.verbose))
     elif options.dump:
         from ir.dumper import Dumper
         for (frame, stm) in funcs.values():
