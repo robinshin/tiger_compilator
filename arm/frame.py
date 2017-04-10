@@ -1,5 +1,5 @@
 from frame.frame import Frame
-from ir.nodes import MOVE, TEMP, Temp
+from ir.nodes import LABEL, MOVE, TEMP, Temp
 
 
 class ArmFrame(Frame):
@@ -16,12 +16,11 @@ class ArmFrame(Frame):
     sp = Temp("sp")
     fp = Temp("r11")
 
-    # List of callee save registers.
-
+    # List of callee save registers (the frame pointer is handled separately).
     callee_save = list(Temp("r%d" % i) for i in range(4, 11))
 
     # List of caller save registers.
-    caller_save = list(Temp("r%d" % i) for i in range(0, 4)) + [lr]
+    caller_save = list(Temp("r%d" % i) for i in range(4)) + [lr]
 
     def __init__(self, label):
         super().__init__(label)
@@ -29,3 +28,15 @@ class ArmFrame(Frame):
     def wrap_result(self, sxp):
         super().wrap_result(sxp)
         return MOVE(TEMP(self.r0), sxp)
+
+    def prologue(self):
+        save_callee_save, restore_callee_save = self.preserve_callee_save()
+        store_parameters = self.transfer_parameters()
+        # The fp save and static link will be saved while generating the code
+        # with ARM specific instructions.
+        return [LABEL(self.label), LABEL(self.allocate_frame_size_label)] + \
+               save_callee_save + store_parameters, \
+               restore_callee_save
+
+    def epilogue(self, data):
+        return [LABEL(self.restore_label)] + data + [LABEL(self.end_label)]
