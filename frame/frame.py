@@ -1,4 +1,4 @@
-from ir.nodes import BINOP, CONST, LABEL, Label, MEM, MOVE, SEQ, TEMP, Temp
+from ir.nodes import BINOP, CONST, LABEL, Label, MEM, MOVE, SEQ, Sxp, TEMP, Temp
 
 
 class Access:
@@ -45,11 +45,15 @@ class Frame:
     # Frame pointer register (Temp)
     fp = None
 
-    # List of callee save registers temps.
+    # List of callee save registers temps. The frame pointer is handled
+    # separately.
     callee_save = []
 
     # List of caller save registers temps.
     caller_save = []
+
+    # Does the architecture use a link register for return addresses?
+    has_lr = True
 
     def __init__(self, label):
         assert isinstance(label, Label), "label must be a Label"
@@ -58,7 +62,7 @@ class Frame:
         self.restore_label = label + "$restore"
         self.allocate_frame_size_label = label + "$allocateFrameSize"
         self.returns_value = False
-        self.offset = self.word_size   # We will at least save the static link
+        self.offset = 0
         self.offsets = {}
         self.param_access = []
         self.max_params_in_regs = len(self.param_regs)
@@ -82,10 +86,8 @@ class Frame:
     def alloc_spill(self):
         """Return the offset of a new variable or parameter stored in the
         frame. The offset is relative to the frame pointer."""
-        try:
-            return -self.offset
-        finally:
-            self.offset += self.word_size
+        self.offset += self.word_size
+        return -self.offset
 
     def wrap_result(self, sxp):
         """Return a Stm which takes the result of the `sxp` parameter and
@@ -94,57 +96,93 @@ class Frame:
         self.returns_value = True
         # The child must override this method and call super()
 
-    def allocate_frame_size(self):
-        """Return a Stm to allocate the frame size."""
-        return LABEL(self.allocate_frame_size_label)
-
-    def decorate(self, stm):
-        """Decorate the `stm` with code which sets up the frame, the stack
-        pointer, the registers holding the parameters, the preservation of
-        the callee saved registers, and the end label."""
-
-        # Begin, restore, and end label creation
-        begin_label = [LABEL(self.label)]
-        restore_label = [LABEL(self.restore_label)]
-        end_label = [LABEL(self.end_label)]
-
-        # Code to save and restore the previous frame pointer and set-it up
-        # wrt the stack pointer. Also, a label is put at the place where the
-        # frame size will be allocated later (we will only know this
-        # information once all the code has been generated and physical
-        # registers have been allocated).
-        saved_fp = Temp.create("savedfp")
-        save_fp = [MOVE(TEMP(saved_fp), TEMP(self.fp)),
-                   MOVE(TEMP(self.fp), TEMP(self.sp)),
-                   self.allocate_frame_size()]
-        restore_fp = [MOVE(TEMP(self.sp), TEMP(self.fp)),
-                      MOVE(TEMP(self.fp), TEMP(saved_fp))]
-
-        # Code to save the static link register into the frame at offset 0.
-        save_static_link = [MOVE(MEM(TEMP(self.fp)), TEMP(self.param_regs[0]))]
-
-        # Code to save and restore the callee-save registers.
+    def preserve_callee_save(self):
+        """Save all the callee save registers and return
+        a list of move instructions to save them and a list
+        of move instructions to restore them."""
         callee_save_map = dict((reg, Temp.create("callee_save"))
                                for reg in self.callee_save)
         save_callee_save = [MOVE(TEMP(callee_save_map[reg]), TEMP(reg))
                             for reg in self.callee_save]
         restore_callee_save = [MOVE(TEMP(reg), TEMP(callee_save_map[reg]))
                                for reg in reversed(self.callee_save)]
+        return save_callee_save, restore_callee_save
+
+    def transfer_parameters(self):
+        """Return a list of move instructions to transfer the parameters
+        from registers or call stack into the register or the frame
+        position they belong to (according to their Access parameter).
+        The first parameter in which the static link has been passed
+        must be handled separately."""
+        return \
+            [MOVE(access.toSxp(TEMP(self.fp)),
+                  TEMP(self.param_regs[idx + 1])
+                  if idx < self.max_params_in_regs - 1
+                  else InFrame((idx - self.max_params_in_regs + (2 if self.has_lr else 3)) *
+                               self.word_size).toSxp(TEMP(self.fp)))
+             for (idx, access) in enumerate(self.param_access)]
+
+    def prologue(self):
+        """Return the function prologue and some opaque value
+        which will be passed to the epilogue. It can be used to
+        pass a register map to be restored from the epilogue for
+        example.
+
+        In this generic method, we will pass around a list of
+        move instructions needed to restore the callee-save
+        registers and the frame pointer.
+
+        It is expected that specific frames will generate more
+        specialized prologues, using dedicated instructions
+        such as push and pop that cannot be easily represented
+        using the IR."""
+
+        begin_label = LABEL(self.label)
+
+        # Push the previous frame pointer and the static link to the stack
+        # and setup the new frame pointer.
+        save_fp = [MOVE(TEMP(self.sp),
+                        BINOP("+", TEMP(self.sp), CONST(-self.word_size))),
+                   MOVE(MEM(TEMP(self.sp)),
+                        TEMP(self.fp)),
+                   MOVE(TEMP(self.sp),
+                       BINOP("+", TEMP(self.sp), CONST(-self.word_size))),
+                    MOVE(MEM(TEMP(self.sp)),
+                        TEMP(self.param_regs[0])),
+                    MOVE(TEMP(self.fp), TEMP(self.fp))]
+        restore_fp = [MOVE(TEMP(self.sp),
+                           BINOP("+", TEMP(self.fp), CONST(self.word_size))),
+                      MOVE(TEMP(self.fp), MEM(TEMP(self.sp))),
+                      MOVE(TEMP(self.sp),
+                           BINOP("+", TEMP(self.sp), CONST(self.word_size)))]
+
+        # Code to save and restore the callee-save registers.
+        save_callee_save, restore_callee_save = self.preserve_callee_save()
 
         # Code to transfer the parameters from registers or call stack into the
         # register or the frame position they belong to (according to their
         # Access parameter). The first parameter (r0, in which the static link
         # had been written) has already been handled above.
-        store_parameters = \
-            [MOVE(access.toSxp(TEMP(self.fp)),
-                  TEMP(self.param_regs[idx + 1])
-                  if idx < self.max_params_in_regs - 1
-                  else InFrame((idx - self.max_params_in_regs + 1) *
-                               self.word_size).toSxp(TEMP(self.fp)))
-             for (idx, access) in enumerate(self.param_access)]
+        store_parameters = self.transfer_parameters()
 
-        return SEQ(begin_label +
-                   save_fp + save_static_link + save_callee_save +
-                   store_parameters + [stm] +
-                   restore_label + restore_callee_save +
-                   restore_fp + end_label)
+        return [begin_label] + save_fp + save_callee_save + \
+               store_parameters, restore_callee_save + restore_fp
+
+    def epilogue(self, data):
+        """Return the function epilogue with data passed from the prologue."""
+        restore_label, end_label = LABEL(self.restore_label), LABEL(self.end_label)
+        return [restore_label] + data + [end_label]
+
+    def decorate(self, stm):
+        """Decorate the `stm` with code which sets up the frame, the stack
+        pointer, the registers holding the parameters, the preservation of
+        the callee saved registers, and the end label."""
+        prologue, data = self.prologue()
+        return SEQ(prologue + [stm] + self.epilogue(data))
+
+    def one_frame_up(self, current_fp):
+        """Return the frame pointer one frame above this one. fp is an Sxp
+        with the current frame pointer, return value is a MEM expression
+        with the frame pointer one level up."""
+        assert isinstance(current_fp, Sxp), "fp must be an expression"
+        return MEM(current_fp)
