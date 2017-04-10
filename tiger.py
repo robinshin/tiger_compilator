@@ -39,6 +39,14 @@ parser.add_option("-I", "--irvm",
                   help="use IRVM target (default: ARM)",
                   action="store_true", default=False,
                   dest="irvm")
+parser.add_option("-l", "--liveness",
+                  help="perform liveness analysis",
+                  action="store_true", default=False,
+                  dest="liveness")
+parser.add_option("-r", "--registers",
+                  help="allocate registers",
+                  action="store_true", default=False,
+                  dest="registers")
 parser.add_option("-t", "--type",
                   help="invoke the typer",
                   action="store_true", default=False,
@@ -51,6 +59,8 @@ parser.usage = """%prog [options] [file]"""
 parser.description = "Compile a Tiger program (or standard input)"
 
 (options, args) = parser.parse_args()
+options.liveness |= options.registers
+options.gen |= options.liveness
 options.canon |= options.gen
 if options.irvm and options.gen:
     print("Error: IRVM cannot be selected for code generation", file=sys.stderr)
@@ -98,6 +108,14 @@ if options.ir:
         assembly = {}
         for (f, (frame, seq)) in funcs.items():
             assembly[f] = (frame, seq.accept(Gen(frame)))
+            if options.liveness and not options.registers:
+                # This is useful for testing only, the register allocation
+                # will take care of calling liveness analysis itself.
+                from codegen.liveness import liveness_analysis
+                liveness_analysis(frame, assembly[f][1])
+            if options.registers:
+                from codegen.alloc import allocate_registers
+                assembly[f] = (frame, allocate_registers(frame, assembly[f][1]))
         if options.dump:
             for (f, (frame, code)) in assembly.items():
                 for i in code:

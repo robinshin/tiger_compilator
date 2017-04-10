@@ -1,3 +1,4 @@
+from codegen.instr import OPER as O
 from frame.frame import Frame
 from ir.nodes import LABEL, MOVE, TEMP, Temp
 
@@ -22,6 +23,9 @@ class ArmFrame(Frame):
     # List of caller save registers.
     caller_save = list(Temp("r%d" % i) for i in range(4)) + [lr]
 
+    # All physical registers appearing in code, used for register allocation.
+    registers = list(Temp("r%d" % i) for i in range(11)) + [sp, lr, fp]
+
     def __init__(self, label):
         super().__init__(label)
 
@@ -40,3 +44,17 @@ class ArmFrame(Frame):
 
     def epilogue(self, data):
         return [LABEL(self.restore_label)] + data + [LABEL(self.end_label)]
+
+    def load_spill(self, temp, offset):
+        assert isinstance(temp, Temp)
+        assert isinstance(offset, int)
+        return [O("ldr {{}}, [{{}}, #{:d}]".format(offset), dsts=[temp], srcs=[self.fp])]
+
+    def save_spill(self, temp, offset):
+        assert isinstance(temp, Temp)
+        assert isinstance(offset, int)
+        return [O("str {{}}, [{{}}, #{:d}]".format(offset), srcs=[temp, self.fp])]
+
+    def reserve_stack_space(self):
+        return [O("add {{}}, {{}}, #-{}".format(self.offset), dsts=[self.sp], srcs=[self.sp])] \
+                if self.offset else []
