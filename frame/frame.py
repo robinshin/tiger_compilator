@@ -146,7 +146,7 @@ class Frame:
                        BINOP("+", TEMP(self.sp), CONST(-self.word_size))),
                     MOVE(MEM(TEMP(self.sp)),
                         TEMP(self.param_regs[0])),
-                    MOVE(TEMP(self.fp), TEMP(self.fp))]
+                    MOVE(TEMP(self.fp), TEMP(self.sp))]
         restore_fp = [MOVE(TEMP(self.sp),
                            BINOP("+", TEMP(self.fp), CONST(self.word_size))),
                       MOVE(TEMP(self.fp), MEM(TEMP(self.sp))),
