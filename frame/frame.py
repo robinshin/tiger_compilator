@@ -93,6 +93,12 @@ class Frame:
         self.returns_value = True
         # The child must override this method and call super()
 
+    def allocate_frame_size(self):
+        """Return the instructions needed to allocate the frame size.
+        The default is to return a single LABEL node that will be filled
+        later when the spills have ben determined."""
+        return [LABEL(self.allocate_frame_size_label)]
+
     def preserve_callee_save(self):
         """Save all the callee save registers and return
         a list of move instructions to save them and a list
@@ -146,7 +152,8 @@ class Frame:
                        BINOP("+", TEMP(self.sp), CONST(-self.word_size))),
                     MOVE(MEM(TEMP(self.sp)),
                         TEMP(self.param_regs[0])),
-                    MOVE(TEMP(self.fp), TEMP(self.sp))]
+                    MOVE(TEMP(self.fp), TEMP(self.sp))] + \
+                    self.allocate_frame_size()
         restore_fp = [MOVE(TEMP(self.sp),
                            BINOP("+", TEMP(self.fp), CONST(self.word_size))),
                       MOVE(TEMP(self.fp), MEM(TEMP(self.sp))),
