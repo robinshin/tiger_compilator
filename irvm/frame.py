@@ -36,5 +36,8 @@ class IrvmFrame(Frame):
         return "L%s" % suffix
 
     def allocate_frame_size(self):
-        return MOVE(TEMP(self.sp),
-                    BINOP('-', TEMP(self.sp), CONST(self.offset)))
+        """In IRVM, we know the frame size at this stage already since
+        we have an infinite number of registers and thus no spills."""
+        return [MOVE(TEMP(self.sp),
+                     BINOP('+', TEMP(self.sp), CONST(-self.offset)))] \
+               if self.offset else []
