@@ -38,7 +38,7 @@ class ArmFrame(Frame):
         store_parameters = self.transfer_parameters()
         # The fp save and static link will be saved while generating the code
         # with ARM specific instructions.
-        return [LABEL(self.label), LABEL(self.allocate_frame_size_label)] + \
+        return [LABEL(self.label)] + self.allocate_frame_size() + \
                save_callee_save + store_parameters, \
                restore_callee_save
 
