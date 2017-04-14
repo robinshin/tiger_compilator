@@ -52,6 +52,9 @@ class Frame:
     # List of caller save registers temps.
     caller_save = []
 
+    # Does the architecture use a link register for return addresses?
+    has_lr = True
+
     def __init__(self, label):
         assert isinstance(label, Label), "label must be a Label"
         self.label = label
@@ -116,12 +119,24 @@ class Frame:
         from registers or call stack into the register or the frame
         position they belong to (according to their Access parameter).
         The first parameter in which the static link has been passed
-        must be handled separately."""
+        must be handled separately.
+
+        Relative to the FP, the stack, when we go up, contains:
+            - the static link (offset 0)
+            - the saved frame pointer (offset 1 * word_size)
+            - the first parameter passed on stack (offset 2 * word_size)
+            - the second parameter passed on stack (offset 3 * word_size)
+            …
+
+        If the architecture does not have a link register, the return
+        address is inserted between the saved frame pointer and the first
+        parameter passed on stack."""
         return \
             [MOVE(access.toSxp(TEMP(self.fp)),
                   TEMP(self.param_regs[idx + 1])
                   if idx < self.max_params_in_regs - 1
-                  else InFrame((idx - self.max_params_in_regs + 1) *
+                  else InFrame((idx - self.max_params_in_regs +
+                                (3 if self.has_lr else 4)) *
                                self.word_size).toSxp(TEMP(self.fp)))
              for (idx, access) in enumerate(self.param_access)]
 
