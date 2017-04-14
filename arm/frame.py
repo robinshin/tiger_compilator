@@ -35,12 +35,15 @@ class ArmFrame(Frame):
 
     def prologue(self):
         save_callee_save, restore_callee_save = self.preserve_callee_save()
+        lr_temp = Temp.create("lr_save")
+        save_lr, restore_lr = MOVE(TEMP(lr_temp), TEMP(self.lr)), \
+                              MOVE(TEMP(self.lr), TEMP(lr_temp))
         store_parameters = self.transfer_parameters()
         # The fp save and static link will be saved while generating the code
         # with ARM specific instructions.
         return [LABEL(self.label)] + self.allocate_frame_size() + \
-               save_callee_save + store_parameters, \
-               restore_callee_save
+               [save_lr] + save_callee_save + store_parameters, \
+               restore_callee_save + [restore_lr]
 
     def epilogue(self, data):
         return [LABEL(self.restore_label)] + data + [LABEL(self.end_label)]
