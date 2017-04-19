@@ -52,6 +52,9 @@ class Frame:
     # List of caller save registers temps.
     caller_save = []
 
+    # List of all physical registers in the CPU, used for register allocation.
+    registers = []
+
     # Does the architecture use a link register for return addresses?
     has_lr = True
 
@@ -205,3 +208,22 @@ class Frame:
         with the frame pointer one level up."""
         assert isinstance(current_fp, Sxp), "fp must be an expression"
         return MEM(current_fp)
+
+    def load_spill(self, temp, offset):
+        """Return a list of instructions (wrapped in Instr instances) that
+        take care of loading the content of the given offset relative to
+        the frame pointer into the temporary."""
+        raise AssertionError("unimplemented")
+
+    def save_spill(self, temp, offset):
+        """Return a list of instructions (wrapped in Instr instances) that
+        take care of saving the given temporary into the content of the
+        offset relative to the frame pointer."""
+        raise AssertionError("unimplemented")
+
+    def reserve_stack_space(self):
+        """Return a list of instructions (wrapped in Instr instances) to
+        reserve the stack space needed for the static link and the spills.
+        This will replace the self.allocate_frame_size_label LABEL
+        declaration at a late stage when all the spills have been determined."""
+        raise AssertionError("unimplemented")
