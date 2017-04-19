@@ -6,9 +6,12 @@ step1/
 step2/
 step3/
 step4/
+step5/
+step6/
 support/
 parser/parsetab.py
 semantics/__init__.py
 semantics/test_run.py
+arm/firmware/
 Makefile
 result.txt
