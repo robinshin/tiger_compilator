@@ -10,6 +10,12 @@ class Instr:
         self.template = template
         self.live_in = set()
         self.live_out = set()
+        # The extra_conflicts field may be used to record
+        # that some instruction operands may not be in some
+        # registers, or in identical parameters. It will be
+        # used by liveness analysis. It is represented as
+        # a list of pairs.
+        self.extra_conflicts = []
 
     def defs(self):
         """Return Temp instances defined by this instruction."""
@@ -23,6 +29,26 @@ class Instr:
         """Return jump targets from this instruction. If empty,
         it means that this instruction jumps to the next one."""
         return []
+
+    def replace_with(self, old_temp, new_temp):
+        """Replace a temporary with another, for example when spilling
+        occurs."""
+        assert isinstance(old_temp, Temp), "old_temp must be a Temp"
+        assert isinstance(new_temp, Temp), "new_temp must be a Temp"
+        self.extra_conflicts = [(new_temp, b) if a == old_temp
+                                else (a, new_temp) if b == old_temp
+                                else (a, b) for (a, b) in self.extra_conflicts
+                               ]
+
+    def record_conflict(self, a, b):
+        """Record a conflict between temporaries used in this instruction.
+        For example, in the ARM instruction set, the mul instruction cannot
+        use the same physical register as Rd and Rm."""
+        assert isinstance(a, Temp), "a must be a Temp"
+        assert isinstance(b, Temp), "a must be a Temp"
+        self.extra_conflicts.append((a, b))
+        # Return self allows us to use this method in chain mode
+        return self
 
     def __str__(self):
         indent = 0 if isinstance(self, LABEL) else 8
@@ -38,7 +64,9 @@ class Instr:
             live_out = ["live out: {}".format(sorted(list(self.live_out), key=lambda t: t.name))] \
                        if self.live_out else []
             jumps = ["jumps: {}".format(self.jumps())] if self.jumps() else []
-            comments = ", ".join(defs + uses + live_in + live_out + jumps)
+            conflicts = ["extra conflicts: {}".format(self.extra_conflicts)] \
+                        if self.extra_conflicts else []
+            comments = ", ".join(defs + uses + live_in + live_out + jumps + conflicts)
             if comments:
                 comments = " ; {}".format(comments)
         else:
@@ -66,6 +94,11 @@ class OPER(Instr):
     def jumps(self):
         return self.jmps
 
+    def replace_with(self, old_temp, new_temp):
+        super().replace_with(old_temp, new_temp)
+        self.dsts = [new_temp if t == old_temp else t for t in self.dsts]
+        self.srcs = [new_temp if t == old_temp else t for t in self.srcs]
+
 
 class MOVE(Instr):
     """A direct transfer instruction between registers."""
@@ -83,6 +116,13 @@ class MOVE(Instr):
     def uses(self):
         return [self.src]
 
+    def replace_with(self, old_temp, new_temp):
+        super().replace_with(old_temp, new_temp)
+        if self.src == old_temp:
+            self.src = new_temp
+        if self.dst == old_temp:
+            self.dst = new_temp
+
 class LABEL(Instr):
     """A label definition."""
 
@@ -98,3 +138,7 @@ class LABEL(Instr):
 
     def uses(self):
         return self.updates
+
+    def replace_with(self, old_temp, new_temp):
+        super().replace_with(old_temp, new_temp)
+        self.updates = [new_temp if t == old_temp else t for t in self.updates]

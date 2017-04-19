@@ -96,6 +96,12 @@ class Frame:
         self.returns_value = True
         # The child must override this method and call super()
 
+    def allocate_frame_size(self):
+        """Return the instructions needed to allocate the frame size.
+        The default is to return a single LABEL node that will be filled
+        later when the spills have ben determined."""
+        return [LABEL(self.allocate_frame_size_label)]
+
     def preserve_callee_save(self):
         """Save all the callee save registers and return
         a list of move instructions to save them and a list
@@ -113,12 +119,24 @@ class Frame:
         from registers or call stack into the register or the frame
         position they belong to (according to their Access parameter).
         The first parameter in which the static link has been passed
-        must be handled separately."""
+        must be handled separately.
+
+        Relative to the FP, the stack, when we go up, contains:
+            - the static link (offset 0)
+            - the saved frame pointer (offset 1 * word_size)
+            - the first parameter passed on stack (offset 2 * word_size)
+            - the second parameter passed on stack (offset 3 * word_size)
+            …
+
+        If the architecture does not have a link register, the return
+        address is inserted between the saved frame pointer and the first
+        parameter passed on stack."""
         return \
             [MOVE(access.toSxp(TEMP(self.fp)),
                   TEMP(self.param_regs[idx + 1])
                   if idx < self.max_params_in_regs - 1
-                  else InFrame((idx - self.max_params_in_regs + (2 if self.has_lr else 3)) *
+                  else InFrame((idx - self.max_params_in_regs +
+                                (3 if self.has_lr else 4)) *
                                self.word_size).toSxp(TEMP(self.fp)))
              for (idx, access) in enumerate(self.param_access)]
 
@@ -149,7 +167,8 @@ class Frame:
                        BINOP("+", TEMP(self.sp), CONST(-self.word_size))),
                     MOVE(MEM(TEMP(self.sp)),
                         TEMP(self.param_regs[0])),
-                    MOVE(TEMP(self.fp), TEMP(self.fp))]
+                    MOVE(TEMP(self.fp), TEMP(self.sp))] + \
+                    self.allocate_frame_size()
         restore_fp = [MOVE(TEMP(self.sp),
                            BINOP("+", TEMP(self.fp), CONST(self.word_size))),
                       MOVE(TEMP(self.fp), MEM(TEMP(self.sp))),
