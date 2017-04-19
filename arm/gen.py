@@ -1,30 +1,25 @@
 from codegen.instr import LABEL as L, MOVE as M, OPER as O
 from ir.nodes import *
 from utils.visitor import *
-
 class Gen:
     """This traverses a tree to generate instructions for a given function.
-
     This visitor is particular in that it returns different types for Stm
     and Sxp nodes:
-
         - Stm nodes return a list of Instr.
         - Sxp nodes return a pair with a list of Instr and a temporary
         containing the result.
-
     This way, we can define only one visitor for both kind of constructs."""
-
     def __init__(self, frame):
         self.frame = frame
-
+        
     # Visitors are mandatory
-
+    
     @visitor(None)
     def visit(self, node):
         raise AssertionError("no code generator for node {}".format(type(node)))
 
     # Visitors for Stm nodes
-
+    
     @visitor(SEQ)
     def visit(self, seq):
         return [i for stm in seq.stms for i in stm.accept(self)]
@@ -84,6 +79,17 @@ class Gen:
 
     # Visitors for Sxp nodes
 
+    @visitor(MEM)
+    def visit(self, mem):
+        # Registre pour stocker le résultat
+        temp = Temp.create("mem")
+        # On évalue l'adresse du MEM
+        adr_stms, adr_temp = mem.exp.accept(self)
+        # On détermine les instructions à effectuer
+        stms = adr_stms + [O("ldr {}, [{}]",dsts=[temp], srcs=[adr_temp])]
+        # On retourne les instructions et le résultat
+        return stms, temp
+    
     @visitor(TEMP)
     def visit(self, temp):
         # Already in a temporary
@@ -93,7 +99,6 @@ class Gen:
     def visit(self, const):
         temp = Temp.create("const")
         return [O("mov {{}}, #{}".format(const.value), dsts=[temp])], temp
-
 
     @visitor(BINOP)
     def visit(self, binop):
@@ -116,6 +121,21 @@ class Gen:
         stms = left_stms + right_stms + [O("{} {}, {}, {}".format(op, temp, left_temp, right_temp))]
         return stms, temp
 
-#    @visitor(CALL)
-#    def visit(self, func):
-
+    @visitor(CALL)
+    def visit(self,func):
+        # Register used to stock result
+        temp = Temp.create("func")
+        # Saving registers
+        stms = [O("push {{r0-r3,lr}}")]
+        args_count = 0
+        for arg in func.args:
+            (stm, tmp) = arg.accept(self)
+            stms += stm
+            if (args_count < 4):
+                stms += [M("mov {{}}, {{}}", dst = Temp("r{}".format(args_count)), src=tmp)]
+            else:
+                stms += [O("push {{{}}}", srcs = [tmp])]
+            args_count += 1
+        stms += [O("pop {{r0-r3,lr}}")]
+        stms +=  [O("bl {}".format(func.func.label.name), jmps=[func.func.label])]
+        return stms, temp
